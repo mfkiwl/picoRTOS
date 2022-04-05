@@ -41,9 +41,9 @@
 	.endm
 
 	.macro ADD_CORE_OFFSET_TO reg
-	mfpir r7
-	se_slwi r7, 2
-	add \reg, r7, \reg
+	mfpir r2
+	se_slwi r2, 2
+	add \reg, r2, \reg
 	.endm
 
 	/* TICK ISR */

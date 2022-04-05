@@ -12,7 +12,7 @@ typedef unsigned long picoRTOS_priority_t;
 typedef unsigned long picoRTOS_mask_t;
 typedef unsigned long picoRTOS_core_t;
 
-#define ARCH_INITIAL_STACK_COUNT 35
+#define ARCH_INITIAL_STACK_COUNT 34
 #define ARCH_MIN_STACK_COUNT (ARCH_INITIAL_STACK_COUNT + 8)
 
 /* splint cannot check inline assembly */

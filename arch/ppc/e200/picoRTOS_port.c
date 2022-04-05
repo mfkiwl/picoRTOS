@@ -52,9 +52,6 @@ picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
     /* Allocate stack */
     sp -= ARCH_INITIAL_STACK_COUNT;
 
-    sp[34] = 0; /* root lr save word */
-    sp[33] = 0; /* root backchain */
-
     /* r[14-31] : 18 registers */
     /* r[0, 3-12] : 11 registers */
     sp[7] = (picoRTOS_stack_t)task->priv;       /* r3 */
