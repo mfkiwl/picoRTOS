@@ -34,6 +34,7 @@
 /* SIO */
 #define SIO_CPUID     ((volatile unsigned long*)(SIO_BASE + 0))
 #define SIO_SPINLOCK0 ((volatile unsigned long*)(SIO_BASE + 0x100))
+#define SIO_SPINLOCK1 ((volatile unsigned long*)(SIO_BASE + 0x104))
 
 /* VTOR */
 #define VTOR ((volatile unsigned long*)0xe000ed08)
@@ -129,3 +130,26 @@ void arch_memory_barrier(void)
     ASM("dmb ish");
 }
 
+/* ATOMIC ops */
+
+picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
+                                        picoRTOS_atomic_t old,
+                                        picoRTOS_atomic_t val)
+{
+    picoRTOS_atomic_t res = val;
+
+    if (*SIO_SPINLOCK1 != 0) {
+        res = *var;
+        if (res == old)
+            *var = val;
+
+        *SIO_SPINLOCK1 = 1ul;
+    }
+
+    return res;
+}
+
+picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
+{
+    return arch_compare_and_swap(ptr, 0, (picoRTOS_atomic_t)1);
+}
