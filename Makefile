@@ -65,7 +65,9 @@ rp2040: ARCH := arch/arm/cm0+/rp2040
 rp2040: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 rp2040:
 	splint $(SPLINTFLAGS) picoRTOS-SMP.c $(ARCH)/../picoRTOS_port.c \
-	  $(ARCH)/picoRTOS-SMP_port.c
+	  $(ARCH)/picoRTOS-SMP_port.c \
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
 linux: ARCH:= arch/pthread/linux
 linux: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples +posixlib -unrecog
