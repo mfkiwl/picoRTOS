@@ -23,6 +23,8 @@ add_executable(blink
   ../../arch/arm/cm0+/picoRTOS_port.c
   ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_portasm.S
   ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_port.c
+  ../../ipc/picoRTOS_mutex.c
+  ../../ipc/picoRTOS_cond.c
   )
 
 # picoRTOS includes

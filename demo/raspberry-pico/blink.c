@@ -7,6 +7,9 @@
 #include "picoRTOS-SMP.h"
 #include "pico/stdlib.h"
 
+#include "ipc/picoRTOS_mutex.h"
+#include "ipc/picoRTOS_cond.h"
+
 #ifndef PICO_DEFAULT_LED_PIN
 # error blink example requires a board with a regular LED
 #endif
@@ -39,7 +42,11 @@ static void tick_main(void *priv)
     }
 }
 
-static void led_main(void *priv)
+/* IPC test */
+static struct picoRTOS_mutex mutex = PICORTOS_MUTEX_INITIALIZER;
+static struct picoRTOS_cond cond = PICORTOS_COND_INITIALIZER;
+
+static void led0_main(void *priv)
 {
     arch_assert(priv == NULL);
 
@@ -48,12 +55,36 @@ static void led_main(void *priv)
     for (;;) {
         picoRTOS_sleep_until(&ref, PICORTOS_DELAY_SEC(1));
 
+        picoRTOS_mutex_lock(&mutex);
+
         /* turn on */
         gpio_put(LED_PIN, 1);
-        picoRTOS_sleep(PICORTOS_DELAY_MSEC(30));
+        picoRTOS_sleep(PICORTOS_DELAY_MSEC(60));
 
         /* turn off */
         gpio_put(LED_PIN, 0);
+        picoRTOS_sleep(PICORTOS_DELAY_MSEC(30));
+
+        /* ipc */
+        picoRTOS_cond_signal(&cond);
+        picoRTOS_mutex_unlock(&mutex);
+    }
+}
+
+static void led1_main(void *priv)
+{
+    arch_assert(priv == NULL);
+
+    for (;;) {
+        picoRTOS_mutex_lock(&mutex);
+        picoRTOS_cond_wait(&cond, &mutex);
+
+        /* turn on */
+        gpio_put(LED_PIN, 1);
+        picoRTOS_sleep(PICORTOS_DELAY_MSEC(30));
+        gpio_put(LED_PIN, 0);
+
+        picoRTOS_mutex_unlock(&mutex);
     }
 }
 
@@ -65,15 +96,20 @@ int main(void)
     struct picoRTOS_task task;
     static picoRTOS_stack_t stack0[CONFIG_DEFAULT_STACK_COUNT];
     static picoRTOS_stack_t stack1[CONFIG_DEFAULT_STACK_COUNT];
+    static picoRTOS_stack_t stack2[CONFIG_DEFAULT_STACK_COUNT];
 
     /* shared task */
     picoRTOS_task_init(&task, tick_main, NULL, stack0, CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, TASK_TICK_PRIO);
 
     /* per core tasks */
-    picoRTOS_task_init(&task, led_main, NULL, stack1, CONFIG_DEFAULT_STACK_COUNT);
-    picoRTOS_add_task(&task, TASK_LED_PRIO);
-    picoRTOS_SMP_set_core_mask(TASK_LED_PRIO, 0x2);
+    picoRTOS_task_init(&task, led0_main, NULL, stack1, CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_add_task(&task, TASK_LED0_PRIO);
+    picoRTOS_SMP_set_core_mask(TASK_LED0_PRIO, 0x2);
+
+    picoRTOS_task_init(&task, led1_main, NULL, stack2, CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_add_task(&task, TASK_LED1_PRIO);
+    picoRTOS_SMP_set_core_mask(TASK_LED1_PRIO, 0x1);
 
     picoRTOS_start();
 
