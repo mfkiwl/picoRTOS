@@ -1,5 +1,11 @@
 # Release notes
 
+## picoRTOS v1.3.1
+### What's new ?
+
+IPC support has been added to RP2040 (+ demo).
+Clear guidelines have been added to the CONTRIBUTING.md file.
+
 ## picoRTOS v1.3
 ### What's new ?
 
