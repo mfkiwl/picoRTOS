@@ -1,10 +1,10 @@
-	.ref _picoRTOS_tick
-	.ref _picoRTOS_switch_context
+	.ref picoRTOS_tick
+	.ref picoRTOS_switch_context
 	
-	.def _arch_INT14
-	.def _arch_RTOSINT
-	.def _arch_start_first_task
-	.def _arch_test_and_set
+	.global arch_INT14
+	.global arch_RTOSINT
+	.global arch_start_first_task
+	.global arch_test_and_set
 	
 SAVE_CONTEXT .macro
 	;;  isr relevant registers are auto-saved
@@ -40,31 +40,31 @@ RESTORE_CONTEXT .macro
 	;;  iret will unstack the rest
 	.endm
 
-_arch_INT14:
+arch_INT14:
 	;; tick interrupt
 	SAVE_CONTEXT
 
 	mov AR6, @SP
 	mov AR4, AR6
-	lcr _picoRTOS_tick
+	lcr picoRTOS_tick
 
 	mov @SP, AR4
 	RESTORE_CONTEXT
 	iret
 
-_arch_RTOSINT:
+arch_RTOSINT:
 	;; context switch interrupt
 	SAVE_CONTEXT
 	
 	mov AR6, @SP
 	mov AR4, AR6
-	lcr _picoRTOS_switch_context
+	lcr picoRTOS_switch_context
 
 	mov @SP, AR4
 	RESTORE_CONTEXT
 	iret
 
-_arch_start_first_task:
+arch_start_first_task:
 	mov @SP, AR4
 	RESTORE_CONTEXT
 	;; emulate first iret
@@ -78,13 +78,13 @@ _arch_start_first_task:
 	subb SP, #2		; ignore ACC
 	pop  T:ST0
 	;; don't forget LRETR will unstack RPC
-	movl XAR0, #_arch_start_first_task
+	movl XAR0, #arch_start_first_task
 	push XAR0
 	;; enable interrupts
 	clrc INTM
 	lretr
 
-_arch_test_and_set:
+arch_test_and_set:
 	mov AL, #1
 	tset *AR4, #0
 	sb arch_test_and_set_return, TC
