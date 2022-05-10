@@ -1,24 +1,31 @@
 #include "picoRTOS-SMP.h"
-#include "picoRTOS_port.h"
 
 #ifndef CONFIG_DEADLOCK_COUNT
 # error Deadlock count is not defined
 #endif
 
 /* regs */
+#define INTC_BASE   0xfc040000
 #define SEMA42_BASE 0xfc03c000
 #define MC_ME_BASE  0xfffb8000
+#define SIUL2_BASE  0xfffc0000
 
-#define SEMA42_GATE0 ((unsigned char*)SEMA42_BASE)
-#define SEMA42_RSTGT ((unsigned short*)(SEMA42_BASE + 0x40))
+#define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x10))
+#define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x20))
 
-#define MC_ME_GS    ((unsigned long*)MC_ME_BASE)
-#define MC_ME_MCTL  ((unsigned long*)(MC_ME_BASE + 0x4))
-#define MC_ME_CCTL  ((unsigned short*)(MC_ME_BASE + 0x1c6))
-#define MC_ME_CADDR ((unsigned long*)(MC_ME_BASE + 0x1e4))
+#define SEMA42_GATE0 ((volatile unsigned char*)SEMA42_BASE)
+#define SEMA42_RSTGT ((volatile unsigned short*)(SEMA42_BASE + 0x40))
+
+#define MC_ME_GS    ((volatile unsigned long*)MC_ME_BASE)
+#define MC_ME_MCTL  ((volatile unsigned long*)(MC_ME_BASE + 0x4))
+#define MC_ME_CCTL  ((volatile unsigned short*)(MC_ME_BASE + 0x1c6))
+#define MC_ME_CADDR ((volatile unsigned long*)(MC_ME_BASE + 0x1e4))
+
+#define SIUL2_MIDR2 ((volatile unsigned long*)(SIUL2_BASE + 0x8))
 
 /* ASM */
-/*@external@*/ extern unsigned long *arch_IVPR(void);
+/*@external@*/ /*@temp@*/ extern unsigned long *arch_IVPR(void);
+/*@external@*/ extern unsigned long arch_R13(void);
 /*@external@*/ extern picoRTOS_core_t arch_core(void);
 /*@external@*/ extern void arch_memory_barrier(void);
 /*@external@*/ extern void arch_core_start(void);
@@ -26,6 +33,7 @@
 /*@external@*/ extern picoRTOS_stack_t *arch_core_sp;
 /*@external@*/ extern picoRTOS_stack_t *arch_task_sp;
 /*@external@*/ extern unsigned long *arch_core_ivpr;
+/*@external@*/ extern unsigned long arch_core_r13;
 
 static void smp_intc_init(void)
 {
@@ -49,6 +57,28 @@ void arch_smp_init(void)
 
     /* init intc */
     smp_intc_init();
+}
+
+static picoRTOS_size_t mc_me_index(picoRTOS_core_t core)
+{
+    char partnum = (char)(*SIUL2_MIDR2 >> 8);
+
+    arch_assert(partnum == 'C' || partnum == 'G');
+
+    if (partnum == 'C') {
+        /* C series (2 cores) */
+        arch_assert(core == (picoRTOS_core_t)1);
+        return (picoRTOS_size_t)2;
+    }
+
+    if (partnum == 'G') {
+        /* G series (3 cores) */
+        arch_assert(core < (picoRTOS_core_t)3);
+        return (picoRTOS_size_t)core;
+    }
+
+    /* other series (unsupported) */
+    return (picoRTOS_size_t)0xfffffff;
 }
 
 static void wait_for_transition_complete(void)
@@ -78,12 +108,14 @@ void arch_core_init(picoRTOS_core_t core,
     arch_core_sp = stack + (stack_count - 1);
     arch_task_sp = sp;
     arch_core_ivpr = arch_IVPR();
+    arch_core_r13 = arch_R13();
 
+    picoRTOS_size_t index = mc_me_index(core);
     unsigned long mctl = *MC_ME_MCTL & 0xffff0000ul;
 
     /* in all modes + start */
-    MC_ME_CCTL[core] = (unsigned short)0xfe;
-    MC_ME_CADDR[core] = (unsigned long)arch_core_start | 0x1;
+    MC_ME_CCTL[index] = (unsigned short)0xfe;
+    MC_ME_CADDR[index] = (unsigned long)arch_core_start | 0x1;
 
     /* enable */
     *MC_ME_MCTL = mctl | 0x5af0ul;

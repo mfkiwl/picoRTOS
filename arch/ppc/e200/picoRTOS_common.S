@@ -3,24 +3,24 @@
 	.extern picoRTOS_tick
 
 	/* arch-specific */
-	.extern arch_TICK
 	.global arch_start_first_task
-	.global arch_test_and_set
 	.global arch_compare_and_swap
 
 	/* special purpose registers */
 	.global arch_MSR
 	.global arch_IVPR
+	.global arch_R13
 	.global arch_core
 	.global arch_memory_barrier
 
 	/* exceptions */
-	.global arch_EE
-	.global arch_SC
+	.global IVOR4_Handler
+	.global IVOR8_Handler
 
 	/* macros */
 	.macro SAVE_CONTEXT
 	e_sub16i r1, r1, 0x8c /* allocate stack */
+	sthcx. r1, 0, r1      /* turn off reservation bit */
 	e_stmvsrrw 0x0 (r1)   /* save SRR[0-1] */
 	e_stmvsprw 0x8 (r1)   /* save CR, LR, CTR, XER */
 	e_stmvgprw 0x18 (r1)  /* save r[0, 3-12] */
@@ -49,23 +49,6 @@ arch_start_first_task:
 	se_mr r1, r3 /* first task stack is arch_start_first_task param 1 */
 	RESTORE_CONTEXT
 	se_rfi
-
-	/* ARCH_TEST_AND_SET */
-	.align 4
-	.type arch_test_and_set, %function
-arch_test_and_set:
-	mbar
-	lbarx r7, 0, r3
-	se_cmpi r7, 0
-	se_bne arch_test_and_set_return
-	e_li r7, 1
-	stbcx. r7, 0, r3
-	se_bne arch_test_and_set_return
-	mbar
-	e_li r7, 0	/* success */
-arch_test_and_set_return:
-	se_mr r3, r7
-	se_blr
 	
 	/* ARCH_COMPARE_AND_SWAP */
 	.align 4
@@ -74,14 +57,14 @@ arch_compare_and_swap:
 	mbar
 	lharx r7, 0, r3
 	se_cmp r7, r4
-	se_bne arch_compare_and_swap_return
+	se_bne .arch_compare_and_swap_return
 	sthcx. r5, 0, r3
-	se_bne arch_compare_and_swap_return
+	se_bne .arch_compare_and_swap_return
 	mbar
 	se_mr r3, r4	/* success */
-arch_compare_and_swap_return:
+.arch_compare_and_swap_return:
 	se_blr
-	
+
 	/* ARCH_MSR */
 	.align 4
 	.type arch_MSR, %function
@@ -94,6 +77,13 @@ arch_MSR:
 	.type arch_IPVR, %function
 arch_IVPR:
 	mfivpr r3
+	se_blr
+
+	/* ARCH_R13 */
+	.align 4
+	.type arch_R13, %function
+arch_R13:
+	mr r3, r13
 	se_blr
 
 	/* ARCH_CORE */
@@ -112,6 +102,7 @@ arch_memory_barrier:
 
 	.align 4
 arch_EE: /* EXTERNAL EXCEPTION */
+IVOR4_Handler:
 	SAVE_CONTEXT
 	mtsprg 1, r1 /* store task stack pointer to SPRG1 */
 	mfsprg r1, 0 /* load kernel stack pointer from SPRG0 */
@@ -140,6 +131,7 @@ arch_EE: /* EXTERNAL EXCEPTION */
 	/* SYSCALL */
 	.align 4
 arch_SC:
+IVOR8_Handler:
 	SAVE_CONTEXT
 	se_mr r3, r1 /* move task stack pointer to r3 */
 	mfsprg r1, 0 /* load kernel stack pointer from SPRG0 */

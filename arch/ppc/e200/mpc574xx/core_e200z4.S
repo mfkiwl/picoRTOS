@@ -5,6 +5,7 @@
 	.global arch_core_sp
 	.global arch_task_sp
 	.global arch_core_ivpr
+	.global arch_core_r13
 
 	.section .sdata
 
@@ -14,6 +15,8 @@ arch_core_sp:
 arch_task_sp:
 	.long 0
 arch_core_ivpr:
+	.long 0
+arch_core_r13:
 	.long 0
 	
 	.section .text
@@ -36,9 +39,13 @@ core_e200z4_start:
 	/* set r1 / main stack */
 	e_lis r1, arch_core_sp@ha
 	e_lwz r1, arch_core_sp@l (r1)
+
+	/* set r13 to bss */
+	e_lis r13, arch_core_r13@ha
+	e_lwz r13, arch_core_r13@l (r13)
 	
 	/* set r3 to task stack */
 	e_lis r3, arch_task_sp@ha
 	e_lwz r3, arch_task_sp@l (r3)
-	
+
 	e_bl arch_start_first_task

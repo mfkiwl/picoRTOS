@@ -1,16 +1,26 @@
 #include "picoRTOS.h"
-#include "picoRTOS_port.h"
 
-#define E_B 0x78000000ul /* e_b mnemonic */
+#define INTC_BASE   0xfc040000
+#define PIT_BASE    0xfff84000
+#define PIT_IRQ     229
+
+#define INTC_BCR   ((volatile unsigned long*)INTC_BASE)
+#define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x10))
+#define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x20))
+#define INTC_EOIR  ((volatile unsigned long*)(INTC_BASE + 0x30))
+#define INTC_PSR   ((volatile unsigned short*)(INTC_BASE + 0x60))
+
+#define PIT_MCR     ((volatile unsigned long*)PIT_BASE)
+/* channel 3 */
+#define PIT_LDVAL3  ((volatile unsigned long*)(PIT_BASE + 0x130))
+#define PIT_CVAL3   ((volatile unsigned long*)(PIT_BASE + 0x134))
+#define PIT_TCTRL3  ((volatile unsigned long*)(PIT_BASE + 0x138))
+#define PIT_TFLG3   ((volatile unsigned long*)(PIT_BASE + 0x13c))
 
 /* ASM */
-/*@external@*/ extern void arch_EE(void);
-/*@external@*/ extern void arch_SC(void);
 /*@external@*/ extern void arch_TICK(void);
 /*@external@*/ extern unsigned long arch_MSR(void);
-/*@external@*/ /*@temp@*/ extern unsigned long *arch_IVPR(void);
 /*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
-/*@external@*/ extern picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr);
 /*@external@*/ extern picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
                                                               picoRTOS_atomic_t old,
                                                               picoRTOS_atomic_t val);
@@ -41,13 +51,7 @@ void arch_init(void)
     /* disable interrupts */
     ASM("wrteei 0");
 
-    /* INTERRUPTS */
-    unsigned long *IVPR = arch_IVPR();
-
-    /* external exception */
-    IVPR[0x10] = E_B | ((unsigned long)arch_EE - (unsigned long)&IVPR[0x10]);
-    /* syscall */
-    IVPR[0x20] = E_B | ((unsigned long)arch_SC - (unsigned long)&IVPR[0x20]);
+    /* INTERRUPTS are statically managed in picoRTOS_common.S */
 
     /* TIMER */
     timer_init();
@@ -102,4 +106,11 @@ void arch_idle(void *null)
 
     for (;;)
         ASM("wait");
+}
+
+/* ATOMIC */
+
+picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
+{
+    return arch_compare_and_swap(ptr, 0, (picoRTOS_atomic_t)1);
 }

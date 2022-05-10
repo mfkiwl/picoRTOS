@@ -1,12 +1,15 @@
 #include "picoRTOS-SMP.h"
-#include "picoRTOS_port.h"
 
 #ifndef CONFIG_DEADLOCK_COUNT
 # error Deadlock count is not defined
 #endif
 
 /* regs */
+#define INTC_BASE   0xfff48000
 #define SEMA42_BASE 0xfff24000
+
+#define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x8))
+#define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x10))
 
 #define SEMA42_GATE0 ((unsigned char*)SEMA42_BASE)
 #define SEMA42_RSTGT ((unsigned short*)(SEMA42_BASE + 0x100))
@@ -15,7 +18,8 @@
 #define RSTVEC1 ((unsigned long*)0xc3f909b0)
 
 /* ASM */
-/*@external@*/ extern unsigned long *arch_IVPR(void);
+/*@external@*/ /*@temp@*/ extern unsigned long *arch_IVPR(void);
+/*@external@*/ extern unsigned long arch_R13(void);
 /*@external@*/ extern picoRTOS_core_t arch_core(void);
 /*@external@*/ extern void arch_memory_barrier(void);
 /*@external@*/ extern void arch_core_start(void);
@@ -23,6 +27,7 @@
 /*@external@*/ extern picoRTOS_stack_t *arch_core_sp;
 /*@external@*/ extern picoRTOS_stack_t *arch_task_sp;
 /*@external@*/ extern unsigned long *arch_core_ivpr;
+/*@external@*/ extern unsigned long arch_core_r13;
 
 static void smp_intc_init(void)
 {
@@ -62,6 +67,7 @@ void arch_core_init(picoRTOS_core_t core,
     arch_core_sp = stack + (stack_count - 1);
     arch_task_sp = sp;
     arch_core_ivpr = arch_IVPR();
+    arch_core_r13 = arch_R13();
 
     /* start, rst + vle */
     RSTVEC1[core - 1] = (unsigned long)arch_core_start | 0x3;
