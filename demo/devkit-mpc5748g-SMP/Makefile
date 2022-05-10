@@ -1,5 +1,6 @@
 # DEVKIT-MPC5748G test board
 ELF_RAM := devkit-mpg5748g-SMP.elf
+ELF_FLASH := devkit-mpg5748g-SMP_flash.elf
 
 CC := gcc
 CROSS := powerpc-eabivle-
@@ -34,6 +35,7 @@ SFLAGS += -g3 -mcpu=e200z4 -specs=ewl_c9x.specs -mbig -mvle -mregnames
 SFLAGS += --sysroot=$(SYSROOT)
 
 LDRAM := $(DEVICES_DIR)/MPC5748G/linker/gcc/MPC5748G_ram.ld
+LDFLASH := $(DEVICES_DIR)/MPC5748G/linker/gcc/MPC5748G_Flash.ld
 LDFLAGS += -Xlinker --gc-sections -mcpu=e200z4 -specs=ewl_c9x.specs -mhard-float
 LDFLAGS += --sysroot=$(SYSROOT)
 
@@ -44,6 +46,8 @@ SRC_S_FILES += $(DEVICES_DIR)/MPC5748G/startup/gcc/interrupt_vectors.S
 
 # picoRTOS
 SRC_C_FILES += $(PICORTOS_DIR)/picoRTOS-SMP.c
+SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.c
+SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_cond.c
 SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS_port.c
 SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS-SMP_port.c
 SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS_portasm.S
@@ -58,11 +62,15 @@ OBJ_FILES += $(SRC_S_FILES:%.S=%.o)
 # fix paths
 OBJ_FILES := $(addprefix $(BUILD_DIR)/,$(OBJ_FILES))
 
-all: $(ELF_RAM)
+all: $(ELF_RAM) $(ELF_FLASH)
 
 $(ELF_RAM): $(OBJ_FILES)
 	-mkdir -p $(@D)
 	$(CROSS)$(CC) $^ -T$(LDRAM) $(LDFLAGS) -o $@
+
+$(ELF_FLASH): $(OBJ_FILES)
+	-mkdir -p $(@D)
+	$(CROSS)$(CC) $^ -T$(LDFLASH) $(LDFLAGS) -o $@
 
 $(BUILD_DIR)/%.o: %.c
 	-mkdir -p $(@D)

@@ -3,6 +3,9 @@
 
 #include "device_registers.h"
 
+#include "ipc/picoRTOS_mutex.h"
+#include "ipc/picoRTOS_cond.h"
+
 #define LED0_0 4            /* PA[4] */
 #define LED1_0 0            /* PA[0] */
 #define LED2_0 (144 + 4)    /* PJ[4] */
@@ -15,8 +18,8 @@
 
 #define TICK 144            /* PJ[0] */
 
-#define LED_DELAY_SHORT PICORTOS_DELAY_MSEC(15)
-#define LED_DELAY_LONG  PICORTOS_DELAY_MSEC(30)
+#define LED_DELAY_SHORT PICORTOS_DELAY_MSEC(30)
+#define LED_DELAY_LONG  PICORTOS_DELAY_MSEC(60)
 
 static void clock_init(void)
 {
@@ -101,6 +104,10 @@ static void tick_main(void *priv)
     }
 }
 
+/* IPC test */
+static struct picoRTOS_mutex mutex = PICORTOS_MUTEX_INITIALIZER;
+static struct picoRTOS_cond cond = PICORTOS_COND_INITIALIZER;
+
 static void led0_main(void *priv)
 {
     arch_assert(priv == NULL);
@@ -109,6 +116,8 @@ static void led0_main(void *priv)
 
     for (;;) {
         picoRTOS_sleep_until(&ref, PICORTOS_DELAY_SEC(1));
+
+        picoRTOS_mutex_lock(&mutex);
 
         /* turn on */
         set_led(LED0_0, false, LED_DELAY_SHORT);
@@ -122,6 +131,10 @@ static void led0_main(void *priv)
         set_led(LED1_0, true, LED_DELAY_LONG);
         set_led(LED0_0, true, LED_DELAY_LONG);
 
+        /* ipc */
+        picoRTOS_cond_signal(&cond);
+        picoRTOS_mutex_unlock(&mutex);
+
         /* stack test */
         deepcall_schedule(10);
     }
@@ -131,10 +144,9 @@ static void led1_main(void *priv)
 {
     arch_assert(priv == NULL);
 
-    picoRTOS_tick_t ref = picoRTOS_get_tick();
-
     for (;;) {
-        picoRTOS_sleep_until(&ref, PICORTOS_DELAY_SEC(1));
+        picoRTOS_mutex_lock(&mutex);
+        picoRTOS_cond_wait(&cond, &mutex);
 
         /* turn on */
         set_led(LED0_1, false, LED_DELAY_SHORT);
@@ -147,6 +159,8 @@ static void led1_main(void *priv)
         set_led(LED2_1, true, LED_DELAY_LONG);
         set_led(LED1_1, true, LED_DELAY_LONG);
         set_led(LED0_1, true, LED_DELAY_LONG);
+
+        picoRTOS_mutex_unlock(&mutex);
 
         /* stack test */
         deepcall_schedule(20);

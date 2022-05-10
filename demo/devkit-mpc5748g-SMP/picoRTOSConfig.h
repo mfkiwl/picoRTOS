@@ -15,7 +15,7 @@
 #define CONFIG_DEFAULT_STACK_COUNT 256
 
 /* SMP */
-#define CONFIG_SMP_CORES          2
+#define CONFIG_SMP_CORES          3
 #define CONFIG_DEADLOCK_COUNT     1000
 
 /* DEBUG */
