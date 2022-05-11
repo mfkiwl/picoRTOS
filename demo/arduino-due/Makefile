@@ -21,9 +21,13 @@ SPLINTFLAGS += -checks
 SRC_C_FILES += $(PICORTOS_DIR)/picoRTOS.c
 SRC_C_FILES += $(PICORTOS_DIR)/arch/arm/cm3/picoRTOS_port.c
 SRC_S_FILES += $(PICORTOS_DIR)/arch/arm/cm3/picoRTOS_portasm.S
+SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.c
+SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_cond.c
 
 SRC_H_FILES += $(PICORTOS_DIR)/picoRTOS.h
 SRC_H_FILES += $(PICORTOS_DIR)/arch/arm/cm3/picoRTOS_types.h
+SRC_H_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.h
+SRC_H_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_cond.h
 SRC_H_FILES += picoRTOSConfig.h
 
 # demo
