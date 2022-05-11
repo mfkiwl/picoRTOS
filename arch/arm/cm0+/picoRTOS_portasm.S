@@ -43,36 +43,33 @@ arch_start_first_task:
 	isb
 
 	pop {r0-r5}	/* pop the registers that are saved automatically */
-	mov lr, r5	/* lr is now in r5 */
-	pop {r3}	/* return address is now in r3 */
-	pop {r2}	/* pop and discard XPSR */
+	mov lr, r5	/* lr is copied from r5 */
+	pop {r2, r3}	/* return address + xspr */
 	cpsie i		/* enable interrupts */
-	bx r3		/* finally, jump to the user defined task code */
+	bx r2		/* finally, jump to the user defined task code */
 
 	.align 1
 	.thumb_func
 	.type arch_SYSTICK, %function
 arch_SYSTICK:
-	push {lr}		/* store lr for interrupt return */
+	push {lr}	/* store lr for interrupt return */
 	SAVE_CONTEXT
 
 	mrs r0, psp
 	bl picoRTOS_tick
 
 	RESTORE_CONTEXT r0
-	pop {r3}	/* restore lr */
-	bx r3
+	pop {pc}	/* return */
 	
 	.align 1
 	.thumb_func
 	.type arch_PENDSV, %function
 arch_PENDSV:
-	push {lr}		/* store lr (interrupt return) */
+	push {lr}	/* store lr (interrupt return) */
 	SAVE_CONTEXT
 
 	mrs r0, psp
 	bl picoRTOS_switch_context
 
 	RESTORE_CONTEXT r0
-	pop {r3}		/* restore lr */
-	bx r3
+	pop {pc}	/* return */
