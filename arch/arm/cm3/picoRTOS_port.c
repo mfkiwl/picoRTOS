@@ -16,7 +16,6 @@
 /*@external@*/ extern void arch_SYSTICK(void);
 /*@external@*/ extern void arch_PENDSV(void);
 /*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
-/*@external@*/ extern picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr);
 /*@external@*/ extern picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
                                                               picoRTOS_atomic_t old,
                                                               picoRTOS_atomic_t val);
@@ -109,3 +108,8 @@ void arch_idle(void *null)
 }
 
 /* ATOMIC OPS */
+
+picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
+{
+    return arch_compare_and_swap(ptr, 0, (picoRTOS_atomic_t)1);
+}

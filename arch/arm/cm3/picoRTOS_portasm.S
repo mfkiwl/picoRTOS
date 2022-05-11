@@ -5,7 +5,6 @@
 	.global arch_SYSTICK
 	.global arch_PENDSV
 
-	.global arch_test_and_set
 	.global arch_compare_and_swap
 	
 	.extern picoRTOS_tick
@@ -32,12 +31,10 @@ arch_start_first_task:
 	msr CONTROL, r0
 	isb
 
-	pop {r0-r5}	/* pop the registers that are saved automatically */
-	mov lr, r5	/* lr is now in r5 */
-	pop {r3}	/* return address is now in r3 */
-	pop {r2}	/* pop and discard XPSR */
-	cpsie i		/* enable interrupts */
-	bx r3		/* finally, jump to the user defined task code */
+	pop {r0-r3, r12, lr}	/* pop the registers that are saved automatically */
+	pop {r2-r3}		/* return addr and xspr */
+	cpsie i			/* enable interrupts */
+	bx r2
 
 	.align 1
 	.thumb_func
@@ -50,8 +47,7 @@ arch_SYSTICK:
 	bl picoRTOS_tick
 
 	RESTORE_CONTEXT r0
-	pop {r3}	/* restore lr */
-	bx r3
+	pop {pc}	/* return */
 	
 	.align 1
 	.thumb_func
@@ -64,25 +60,7 @@ arch_PENDSV:
 	bl picoRTOS_switch_context
 
 	RESTORE_CONTEXT r0
-	pop {r3}		/* restore lr */
-	bx r3
-
-	.align 1
-	.thumb_func
-	.type arch_test_and_set, %function
-arch_test_and_set:
-	dmb ish
-	ldrex r2, [r0]
-	cmp r2, #0
-	bne arch_test_and_set_return
-	mov r2, #1
-	strex r3, r2, [r0]
-	cmp r3, #0
-	bne arch_test_and_set_return
-	dmb ish
-	mov r0, #0
-arch_test_and_set_return:
-	bx lr
+	pop {pc}		/* return */
 
 	.align 1
 	.thumb_func
@@ -91,11 +69,10 @@ arch_compare_and_swap:
 	dmb ish
 	ldrex r3, [r0]
 	cmp r3, r1
-	bne arch_compare_and_swap_return
-	/* TBD */
+	bne .arch_compare_and_swap_return
 	strex r3, r2, [r0]
-	bne arch_compare_and_swap_return
+	it eq
+	moveq r0, r1
 	dmb ish
-	mov r0, r1
-arch_compare_and_swap_return:
+.arch_compare_and_swap_return:
 	bx lr
