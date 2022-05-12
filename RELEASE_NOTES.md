@@ -1,5 +1,23 @@
 # Release notes
 
+## picoRTOS v1.3.2
+### What's new ?
+
+On NXP MPC574xC/G, the e200z2 can now be used as an auxiliary core and a
+major bug has been fixed (auxilary core crashed when trying to access the data section).
+The picoRTOS_port.h file has been removed (for better or for worse).
+
+The ARM CM0+ family (including RP2040) have been refactored and duplicated asm code
+has been removed.
+
+The CM3 port has been slightly improved and IPCs have been added to the Arduino Due demo.
+
+On c28x, the assembly code has been refactored to be compatible with the eabi option
+(required if you want to use fpu64).
+
+A /*@unused@*/ splint tag has been added to the trylock functions to notify they
+may or may not be called externally.
+
 ## picoRTOS v1.3.1
 ### What's new ?
 
