@@ -12,6 +12,7 @@ picoRTOS is a teeny tiny RTOS with as little overhead as humanely possible.
 
  - ARM Cortex-M0+
  - ARM Cortex-M3
+ - ARM Cortex-M4F
  - ATmega2560 / AVR6
  - ATmega328P / AVR5
  - C2000 / C28x

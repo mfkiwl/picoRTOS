@@ -1,5 +1,15 @@
 # Release notes
 
+## picoRTOS v1.4.0
+### What's new ?
+
+One new architecture has been added:
+ - Cortex-M4F (ARM)
+
+The corresponding blink demo has been added to the demo directory
+at demo/s32k142evb-q100 and the static analysis is performed by the
+makefile.
+
 ## picoRTOS v1.3.2
 ### What's new ?
 
