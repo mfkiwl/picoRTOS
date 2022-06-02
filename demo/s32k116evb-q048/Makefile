@@ -58,7 +58,7 @@ all: $(ELF_RAM) $(ELF_FLASH)
 $(ELF_RAM): $(OBJ_FILES)
 	-mkdir -p $(@D)
 	$(CROSS)$(CC) $^ -T$(LDRAM) $(LDFLAGS) -o $@
-	
+
 $(ELF_FLASH): $(OBJ_FILES)
 	-mkdir -p $(@D)
 	$(CROSS)$(CC) $^ -T$(LDFLASH) $(LDFLAGS) -o $@
