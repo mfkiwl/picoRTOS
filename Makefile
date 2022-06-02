@@ -1,4 +1,4 @@
-CHECKS := c28x cm0+ cm3 e200z4 e200z7 e200z4-smp e200z7-smp avr5 avr6 rp2040
+CHECKS := c28x cm0+ cm3 cm4f e200z4 e200z7 e200z4-smp e200z7-smp avr5 avr6 rp2040
 SPLINTFLAGS := -I. -DCONFIG_CHECK_STACK_INTEGRITY -checks -exportlocal
 
 all: $(CHECKS)
@@ -17,6 +17,13 @@ cm0+:
 cm3: ARCH := arch/arm/cm3
 cm3: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 cm3:
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
+
+cm4f: ARCH := arch/arm/cm4f
+cm4f: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+cm4f:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
 	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
 	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
