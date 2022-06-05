@@ -13,11 +13,10 @@
 
 	.equ CPACR, 0xe000ed88
 	
-	.macro SAVE_CONTEXT
-	mrs r0, psp		/* use r0 as psp stack */
-	stmdb r0!, {r4-r11}	/* save registers r4-r11 */
-	vstmdb r0!, {s16-s31}	/* save fpu high registers */
-	msr psp, r0		/* store new top of stack */
+	.macro SAVE_CONTEXT rS
+	mrs \rS, psp		/* use rS as psp stack */
+	stmdb \rS!, {r4-r11}	/* save registers r4-r11 */
+	vstmdb \rS!, {s16-s31}	/* save fpu high registers */
 	.endm
 
 	.macro RESTORE_CONTEXT rS
@@ -57,11 +56,8 @@ arch_start_first_task:
 	.type arch_SYSTICK, %function
 arch_SYSTICK:
 	push {lr}		/* store lr for interrupt return */
-	SAVE_CONTEXT
-
-	mrs r0, psp
+	SAVE_CONTEXT r0
 	bl picoRTOS_tick
-
 	RESTORE_CONTEXT r0
 	pop {pc}	/* return */
 	
@@ -70,11 +66,8 @@ arch_SYSTICK:
 	.type arch_PENDSV, %function
 arch_PENDSV:
 	push {lr}		/* store lr (interrupt return) */
-	SAVE_CONTEXT
-
-	mrs r0, psp
+	SAVE_CONTEXT r0
 	bl picoRTOS_switch_context
-
 	RESTORE_CONTEXT r0
 	pop {pc}		/* return */
 

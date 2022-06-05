@@ -13,7 +13,7 @@
 	.type arch_PWM_WRAP, %function
 arch_PWM_WRAP:
 	push {lr}	/* store lr for interrupt return */
-	SAVE_CONTEXT
+	SAVE_CONTEXT r0
 
 	/* ack pwm */
 	ldr r3, =PWM_INTR
@@ -23,8 +23,6 @@ arch_PWM_WRAP:
 	movs r2, #16
 	str r2, [r3]
 
-	mrs r0, psp
-	bl picoRTOS_tick
-	
+	bl picoRTOS_tick	
 	RESTORE_CONTEXT r0
 	pop {pc}	/* return */

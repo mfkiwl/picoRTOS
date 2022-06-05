@@ -8,28 +8,27 @@
 	.extern picoRTOS_tick
 	.extern picoRTOS_switch_context
 
-	.macro SAVE_CONTEXT
-	mrs r0, psp			/* allocate stack */
-	subs r0, r0, #32
-	msr psp, r0		    	/* store new top of stack */
-	stmia r0!, {r4-r7}		/* store the low registers */
-	mov r4, r8			/* store the high registers */
+	.macro SAVE_CONTEXT rS
+	mrs \rS, psp
+	subs \rS, \rS, #16	/* store low registers */
+	stmia \rS!, {r4-r7}
+	mov r4, r8
 	mov r5, r9
 	mov r6, r10
 	mov r7, r11
-	stmia r0!, {r4-r7}
+	subs \rS, \rS, #32	/* store high registers */
+	stmia \rS!, {r4-r7}
+	subs \rS, \rS, #16	/* revert auto-increment */
 	.endm
 
 	.macro RESTORE_CONTEXT rS
-	adds \rS, \rS, #16	/* load the high registers */
-	ldmia \rS!, {r4-r7}
+	ldmia \rS!, {r4-r7} 	/* load high registers */
 	mov r8, r4
 	mov r9, r5
 	mov r10, r6
 	mov r11, r7
-	msr psp, \rS		/* reclaim stack space */
-	subs \rS, \rS, #32	/* load the low registers */
-	ldmia \rS!, {r4-r7}
+	ldmia \rS!, {r4-r7}	/* load low registers */
+	msr psp, \rS
 	.endm
 	
 	.align 1
@@ -53,11 +52,8 @@ arch_start_first_task:
 	.type arch_SYSTICK, %function
 arch_SYSTICK:
 	push {lr}	/* store lr for interrupt return */
-	SAVE_CONTEXT
-
-	mrs r0, psp
+	SAVE_CONTEXT r0
 	bl picoRTOS_tick
-
 	RESTORE_CONTEXT r0
 	pop {pc}	/* return */
 	
@@ -66,10 +62,7 @@ arch_SYSTICK:
 	.type arch_PENDSV, %function
 arch_PENDSV:
 	push {lr}	/* store lr (interrupt return) */
-	SAVE_CONTEXT
-
-	mrs r0, psp
+	SAVE_CONTEXT r0
 	bl picoRTOS_switch_context
-
 	RESTORE_CONTEXT r0
 	pop {pc}	/* return */
