@@ -44,7 +44,7 @@ static void move_vtable_to_ram(void)
 void arch_init(void)
 {
     /* disable interrupts */
-    ASM("cpsid i");
+    ASM("cpsid if");
 
     /* VFP */
     arch_enable_vfp();
@@ -71,13 +71,13 @@ void arch_init(void)
 void arch_suspend(void)
 {
     /* disable interrupts */
-    ASM("cpsid i");
+    ASM("cpsid if");
 }
 
 void arch_resume(void)
 {
     /* enable interrupts */
-    ASM("cpsie i");
+    ASM("cpsie if");
 }
 
 picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
@@ -87,6 +87,10 @@ picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
 
     /* ARM v6 reference manual, section B1.5.6 */
     sp -= ARCH_INITIAL_STACK_COUNT;
+
+    /* sp[49] = reserved */
+    /* sp[48] = fpscr */
+    /* sp[47-32] = s15...s0 */
 
     sp[31] = (picoRTOS_stack_t)0x1000000;       /* xspr */
     sp[30] = (picoRTOS_stack_t)task->fn;        /* return address */

@@ -10,8 +10,6 @@
 	
 	.extern picoRTOS_tick
 	.extern picoRTOS_switch_context
-
-	.equ CPACR, 0xe000ed88
 	
 	.macro SAVE_CONTEXT rS
 	mrs \rS, psp		/* use rS as psp stack */
@@ -25,13 +23,21 @@
 	msr psp, \rS		/* reclaim stack space */
 	.endm
 	
+	.equ CPACR, 0xe000ed88
+	.equ FPCCR, 0xe000ef34
+
 	.align 1
 	.thumb_func
 	.type arch_enable_vfp, %function
 arch_enable_vfp:
+	/* enable CP10 & CP11 */
 	ldr.w r0, =CPACR
 	ldr r1, [r0]
-	orr r1, r1, #0xf00000	/* enable CP10 & CP11 */
+	orr r1, r1, #0xf00000
+	str r1, [r0]
+	/* extended FPU frame stacking (no lazy frame) */
+	ldr.w r0, =FPCCR
+	movs r1, #0x80000000
 	str r1, [r0]
 	bx lr
 	
@@ -40,15 +46,20 @@ arch_enable_vfp:
 	.type arch_start_first_task, %function
 arch_start_first_task:
 	RESTORE_CONTEXT r0
-	/* switch to psp stack */
-	movs r0, #2
+	/* switch to psp stack & activate FP */
+	movs r0, #6
 	msr CONTROL, r0
 	isb
 
 	pop {r0-r3, r12, lr}	/* pop the registers that are saved automatically */
 	pop {r2, r3}		/* return address and xspr */
-	cpsie i			/* enable interrupts */
-	cpsie f
+
+	/* pop fpu */
+	mrs r4, psp
+	add r4, r4, #72
+	msr psp, r4
+
+	cpsie if			/* enable interrupts */
 	bx r2
 
 	.align 1
