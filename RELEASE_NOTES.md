@@ -1,5 +1,14 @@
 # Release notes
 
+## picoRTOS v1.4.1
+### What's new ?
+
+ARM context switching assembly code has been simplified a lot, removing as many useless
+instructions as possible.
+
+A major bug has been fixed on Cortex-M4, FPU was not configured properly and led to
+crashes if used.
+
 ## picoRTOS v1.4.0
 ### What's new ?
 
