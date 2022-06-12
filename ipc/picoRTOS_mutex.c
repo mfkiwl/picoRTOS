@@ -38,7 +38,9 @@ void picoRTOS_mutex_lock(struct picoRTOS_mutex *mutex)
 
 void picoRTOS_mutex_unlock(struct picoRTOS_mutex *mutex)
 {
-    arch_assert(mutex->owner == (picoRTOS_atomic_t)picoRTOS_self());
+    picoRTOS_atomic_t owner = (picoRTOS_atomic_t)picoRTOS_self();
+
+    arch_assert(mutex->owner == owner);
     arch_assert(mutex->count > 0);
 
     if (--mutex->count == 0)
