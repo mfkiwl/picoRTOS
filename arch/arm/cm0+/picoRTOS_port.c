@@ -109,3 +109,26 @@ void arch_idle(void *null)
     for (;;)
         ASM("wfe");
 }
+
+/* ATOMIC OPS EMULATION */
+#ifdef CONFIG_ARCH_EMULATE_ATOMIC
+picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
+                                        picoRTOS_atomic_t old,
+                                        picoRTOS_atomic_t val)
+{
+    ASM("cpsid i");
+
+    if (*var == old) {
+        *var = val;
+        val = old;
+    }
+
+    ASM("cpsie i");
+    return val;
+}
+
+picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
+{
+    return arch_compare_and_swap(ptr, 0, (picoRTOS_atomic_t)1);
+}
+#endif

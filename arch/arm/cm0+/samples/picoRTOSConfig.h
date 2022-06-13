@@ -14,4 +14,7 @@
 /* VTABLE */
 #define CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
 
+/* IPCs */
+#define CONFIG_ARCH_EMULATE_ATOMIC
+
 #endif
