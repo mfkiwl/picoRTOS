@@ -43,10 +43,10 @@ job much easier for critical applications.
 
 ## Advanced features
 
-IPCs are available to architectures that support the correct associated atomic operations,
-though no emulation is provided through activation/deactivation of the interrupts
-for the ones that don't, as this would go against the hard real time philosophy of
-the project.
+IPCs are available to architectures that support the correct associated atomic operations.
+A small infringement has been made to the hard real time philosophy of the project by supporting
+the CONFIG_ARCH_EMULATE_ATOMIC on platforms that don't support native atomic operations. This is
+not recommended, though.
 
 ### The following IPCs are provided:
 

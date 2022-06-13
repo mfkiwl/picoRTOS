@@ -1,5 +1,20 @@
 # Release notes
 
+## picoRTOS v1.4.2
+### What's new ?
+
+We finally gave up on the policy that totally forbids CPU without native support for atomic 
+operations to use IPCs. A new keyword/define (CONFIG_ARCH_EMULATE_ATOMIC) has been added
+for these specific targets:
+ - Cortex-M0+
+ - AVR5 (ATMega328P)
+ - AVR6 (ATMega2560)
+
+Activating this option will allow IPCs on these chips and sightly lower their real-time
+performance.
+
+picoRTOS_sleep and picoRTOS_sleep_until functions have been protected a little bit better
+
 ## picoRTOS v1.4.1
 ### What's new ?
 
