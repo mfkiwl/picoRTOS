@@ -97,4 +97,26 @@ void arch_idle(void *null)
         ASM("sleep");
 }
 
-/* ATOMIC OPS: no support on this architecture */
+/* ATOMIC OPS EMULATION */
+#ifdef CONFIG_ARCH_EMULATE_ATOMIC
+picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
+                                        picoRTOS_atomic_t old,
+                                        picoRTOS_atomic_t val)
+{
+    ASM("cli");
+
+    if (*var == old) {
+        *var = val;
+        val = old;
+    }
+
+    ASM("sei");
+    return val;
+}
+
+picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
+{
+    return arch_compare_and_swap(ptr, (picoRTOS_atomic_t)0,
+                                 (picoRTOS_atomic_t)1);
+}
+#endif
