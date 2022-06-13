@@ -12,7 +12,7 @@ void picoRTOS_futex_init(picoRTOS_futex_t *futex)
 
 int picoRTOS_futex_trylock(picoRTOS_futex_t *futex)
 {
-    if (arch_test_and_set((picoRTOS_atomic_t*)futex) != 0)
+    if (arch_test_and_set((picoRTOS_atomic_t*)futex) != (picoRTOS_atomic_t)0)
         return -1;
 
     return 0;
@@ -31,7 +31,7 @@ void picoRTOS_futex_lock(picoRTOS_futex_t *futex)
 
 void picoRTOS_futex_unlock(picoRTOS_futex_t *futex)
 {
-    arch_assert(*futex != 0);
+    arch_assert(*futex != (picoRTOS_atomic_t)0);
 
     *futex = (picoRTOS_futex_t)0;
 }
