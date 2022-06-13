@@ -12,7 +12,9 @@ c28x:
 cm0+: ARCH := arch/arm/cm0+
 cm0+: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 cm0+:
-	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
 cm3: ARCH := arch/arm/cm3
 cm3: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
@@ -61,12 +63,16 @@ e200z7-smp:
 avr5: ARCH := arch/avr/avr5
 avr5: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 avr5:
-	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
 avr6: ARCH := arch/avr/avr6
 avr6: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 avr6:
-	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
 rp2040: ARCH := arch/arm/cm0+/rp2040
 rp2040: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples

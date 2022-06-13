@@ -16,5 +16,6 @@
 
 /* IPCs */
 #define CONFIG_ARCH_EMULATE_ATOMIC
+#define CONFIG_DEADLOCK_COUNT 1000
 
 #endif
