@@ -135,8 +135,10 @@ void picoRTOS_sleep(picoRTOS_tick_t delay)
     arch_assert(picoRTOS.is_running != 0);
 
     if (delay > 0) {
+        arch_suspend();
         task->tick = picoRTOS.tick + delay;
         task->state = PICORTOS_TASK_STATE_SLEEP;
+        arch_resume();
     }
 
     arch_yield();
@@ -150,17 +152,27 @@ void picoRTOS_sleep_until(picoRTOS_tick_t *ref, picoRTOS_tick_t period)
     arch_assert(picoRTOS.is_running != 0);
 
     /* compute next wakeup */
-    *ref += period;
+    picoRTOS_tick_t next = *ref + period;
 
-    task->tick = *ref;
-    task->state = PICORTOS_TASK_STATE_SLEEP;
+    arch_suspend();
+    if (next > picoRTOS.tick) {
+        *ref = next;
+        task->tick = next;
+        task->state = PICORTOS_TASK_STATE_SLEEP;
+    }else
+        /* missed the clock: reset to tick */
+        *ref = picoRTOS.tick;
 
+    arch_resume();
     arch_yield();
 }
 
 void picoRTOS_kill(void)
 {
+    arch_suspend();
     picoRTOS.task[picoRTOS.index].state = PICORTOS_TASK_STATE_EMPTY;
+    arch_resume();
+
     arch_yield();
 }
 
