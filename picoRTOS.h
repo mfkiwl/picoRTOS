@@ -80,4 +80,9 @@ arch_compare_and_swap(/*@notnull@*/ picoRTOS_atomic_t *var,
 # define arch_assert(x) if (!(x)) for (;;)
 #endif
 
+#ifdef S_SPLINT_S
+# undef arch_assert
+/*@noreturnwhenfalse@*/ void arch_assert(/*@sef@*/ bool predicate);
+#endif
+
 #endif
