@@ -157,14 +157,16 @@ void picoRTOS_start(void)
 
 void picoRTOS_suspend()
 {
-    arch_spin_lock();
     arch_suspend();
+    arch_spin_lock();
+    arch_memory_barrier();
 }
 
 void picoRTOS_resume()
 {
-    arch_resume();
+    arch_memory_barrier();
     arch_spin_unlock();
+    arch_resume();
 }
 
 void picoRTOS_schedule(void)
@@ -179,15 +181,12 @@ void picoRTOS_sleep(picoRTOS_tick_t delay)
 
     arch_assert(task->state == PICORTOS_SMP_TASK_STATE_RUNNING);
 
-    arch_spin_lock();
-
     if (delay > 0) {
+        picoRTOS_suspend();
         task->tick = picoRTOS.tick + delay;
         task->state = PICORTOS_SMP_TASK_STATE_SLEEP;
+        picoRTOS_resume();
     }
-
-    arch_memory_barrier();
-    arch_spin_unlock();
 
     arch_yield();
 }
@@ -200,17 +199,19 @@ void picoRTOS_sleep_until(picoRTOS_tick_t *ref, picoRTOS_tick_t period)
     arch_assert(period > 0);
     arch_assert(task->state == PICORTOS_SMP_TASK_STATE_RUNNING);
 
-    arch_spin_lock();
-
     /* compute next wakeup */
-    *ref += period;
+    picoRTOS_tick_t next = *ref + period;
 
-    task->tick = *ref;
-    task->state = PICORTOS_SMP_TASK_STATE_SLEEP;
+    picoRTOS_suspend();
+    if (next > picoRTOS.tick) {
+        *ref = next;
+        task->tick = next;
+        task->state = PICORTOS_SMP_TASK_STATE_SLEEP;
+    }else
+        /* missed the clock: reset to tick */
+        *ref = picoRTOS.tick;
 
-    arch_memory_barrier();
-    arch_spin_unlock();
-
+    picoRTOS_resume();
     arch_yield();
 }
 
@@ -244,6 +245,7 @@ picoRTOS_stack_t *picoRTOS_switch_context(picoRTOS_stack_t *sp)
 #endif
 
     arch_spin_lock();
+    arch_memory_barrier();
 
     /* store current sp */
     picoRTOS.task[index].sp = sp;
@@ -287,6 +289,7 @@ picoRTOS_stack_t *picoRTOS_tick(picoRTOS_stack_t *sp)
 #endif
 
     arch_spin_lock();
+    arch_memory_barrier();
 
     /* store current sp */
     picoRTOS.task[index].sp = sp;
