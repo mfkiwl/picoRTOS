@@ -5,7 +5,6 @@
 
 typedef unsigned long picoRTOS_stack_t;
 typedef unsigned long picoRTOS_tick_t;
-typedef unsigned long picoRTOS_size_t;
 typedef unsigned long picoRTOS_priority_t;
 typedef unsigned short picoRTOS_atomic_t;
 

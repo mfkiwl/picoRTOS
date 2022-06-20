@@ -4,7 +4,6 @@
 /* optimize for speed */
 typedef unsigned char picoRTOS_stack_t;
 typedef unsigned int picoRTOS_tick_t;
-typedef unsigned int picoRTOS_size_t;
 typedef unsigned int picoRTOS_priority_t;
 typedef unsigned char picoRTOS_atomic_t;
 

@@ -3,7 +3,7 @@
 void picoRTOS_cond_init(struct picoRTOS_cond *cond)
 {
     cond->act = PICORTOS_COND_NONE;
-    cond->count = (picoRTOS_size_t)0;
+    cond->count = (size_t)0;
 }
 
 void picoRTOS_cond_signal(struct picoRTOS_cond *cond)
@@ -18,7 +18,7 @@ void picoRTOS_cond_broadcast(struct picoRTOS_cond *cond)
 
 void picoRTOS_cond_wait(struct picoRTOS_cond *cond, struct picoRTOS_mutex *mutex)
 {
-    arch_assert(cond->count < (picoRTOS_size_t)CONFIG_TASK_COUNT);
+    arch_assert(cond->count < (size_t)CONFIG_TASK_COUNT);
 
     /* we already own the mutex */
     cond->count++;

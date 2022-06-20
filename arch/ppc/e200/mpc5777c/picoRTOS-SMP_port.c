@@ -31,7 +31,7 @@
 
 static void smp_intc_init(void)
 {
-    picoRTOS_size_t n = (picoRTOS_size_t)CONFIG_SMP_CORES;
+    size_t n = (size_t)CONFIG_SMP_CORES;
     unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
 
     while (n-- != 0) {
@@ -55,13 +55,13 @@ void arch_smp_init(void)
 
 void arch_core_init(picoRTOS_core_t core,
                     picoRTOS_stack_t *stack,
-                    picoRTOS_size_t stack_count,
+                    size_t stack_count,
                     picoRTOS_stack_t *sp)
 {
     arch_assert(core > 0);
     arch_assert(core < (picoRTOS_core_t)CONFIG_SMP_CORES);
     arch_assert(stack != NULL);
-    arch_assert(stack_count >= (picoRTOS_size_t)ARCH_MIN_STACK_COUNT);
+    arch_assert(stack_count >= (size_t)ARCH_MIN_STACK_COUNT);
     arch_assert(sp != NULL);
 
     arch_core_sp = stack + (stack_count - 1);

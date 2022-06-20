@@ -91,7 +91,7 @@ static void core1_start_first_task(void)
 
 void arch_core_init(picoRTOS_core_t core,
                     picoRTOS_stack_t *stack,
-                    picoRTOS_size_t stack_count,
+                    size_t stack_count,
                     picoRTOS_stack_t *sp)
 {
     /* only 1 auxiliary core */

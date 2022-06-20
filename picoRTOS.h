@@ -13,13 +13,13 @@ struct picoRTOS_task {
     /*@temp@*/ picoRTOS_task_fn_t fn;
     /*@temp@*/ void *priv;
     /*@temp@*/ picoRTOS_stack_t *stack;
-    picoRTOS_size_t stack_count;
+    size_t stack_count;
 };
 
 void picoRTOS_task_init(/*@out@*/ struct picoRTOS_task *task,
                         picoRTOS_task_fn_t fn, /*@null@*/ void *priv,
                         /*@notnull@*/ picoRTOS_stack_t *stack,
-                        picoRTOS_size_t stack_count);
+                        size_t stack_count);
 
 /* SCHEDULER */
 void picoRTOS_init(void);

@@ -37,7 +37,7 @@
 
 static void smp_intc_init(void)
 {
-    picoRTOS_size_t n = (picoRTOS_size_t)CONFIG_SMP_CORES;
+    size_t n = (size_t)CONFIG_SMP_CORES;
     unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
 
     while (n-- != 0) {
@@ -59,7 +59,7 @@ void arch_smp_init(void)
     smp_intc_init();
 }
 
-static picoRTOS_size_t mc_me_index(picoRTOS_core_t core)
+static size_t mc_me_index(picoRTOS_core_t core)
 {
     char partnum = (char)(*SIUL2_MIDR2 >> 8);
 
@@ -68,17 +68,17 @@ static picoRTOS_size_t mc_me_index(picoRTOS_core_t core)
     if (partnum == 'C') {
         /* C series (2 cores) */
         arch_assert(core == (picoRTOS_core_t)1);
-        return (picoRTOS_size_t)2;
+        return (size_t)2;
     }
 
     if (partnum == 'G') {
         /* G series (3 cores) */
         arch_assert(core < (picoRTOS_core_t)3);
-        return (picoRTOS_size_t)core;
+        return (size_t)core;
     }
 
     /* other series (unsupported) */
-    return (picoRTOS_size_t)0xfffffff;
+    return (size_t)0xfffffff;
 }
 
 static void wait_for_transition_complete(void)
@@ -96,13 +96,13 @@ static void wait_for_transition_complete(void)
 
 void arch_core_init(picoRTOS_core_t core,
                     picoRTOS_stack_t *stack,
-                    picoRTOS_size_t stack_count,
+                    size_t stack_count,
                     picoRTOS_stack_t *sp)
 {
     arch_assert(core > 0);
     arch_assert(core < (picoRTOS_core_t)CONFIG_SMP_CORES);
     arch_assert(stack != NULL);
-    arch_assert(stack_count >= (picoRTOS_size_t)ARCH_MIN_STACK_COUNT);
+    arch_assert(stack_count >= (size_t)ARCH_MIN_STACK_COUNT);
     arch_assert(sp != NULL);
 
     arch_core_sp = stack + (stack_count - 1);
@@ -110,7 +110,7 @@ void arch_core_init(picoRTOS_core_t core,
     arch_core_ivpr = arch_IVPR();
     arch_core_r13 = arch_R13();
 
-    picoRTOS_size_t index = mc_me_index(core);
+    size_t index = mc_me_index(core);
     unsigned long mctl = *MC_ME_MCTL & 0xffff0000ul;
 
     /* in all modes + start */

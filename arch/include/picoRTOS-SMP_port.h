@@ -10,7 +10,7 @@ extern void arch_smp_init(void); /* init picoRTOS SMP for arch */
 
 extern void arch_core_init(picoRTOS_core_t core,
                            /*@notnull@*/ picoRTOS_stack_t *stack,
-                           picoRTOS_size_t stack_count,
+                           size_t stack_count,
                            /*@notnull@*/ picoRTOS_stack_t *sp);     /* start core */
 
 extern picoRTOS_core_t arch_core(void);                             /* get core id */

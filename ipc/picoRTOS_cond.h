@@ -12,12 +12,12 @@ enum picoRTOS_cond_act {
 
 struct picoRTOS_cond {
     enum picoRTOS_cond_act act;
-    picoRTOS_size_t count;
+    size_t count;
 };
 
 /* macro for static init */
 #define PICORTOS_COND_INITIALIZER               \
-    { PICORTOS_COND_NONE, (picoRTOS_size_t)0 }
+    { PICORTOS_COND_NONE, (size_t)0 }
 
 void picoRTOS_cond_init(/*@notnull@*/ struct picoRTOS_cond *cond);
 

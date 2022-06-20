@@ -79,7 +79,7 @@ void arch_resume(void)
 
 picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
 {
-    picoRTOS_size_t i = 0;
+    size_t i = 0;
     picoRTOS_stack_t *sp = task->stack;
 
     /* End return call stack (debug) */
