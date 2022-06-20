@@ -12,7 +12,8 @@ BUILD_DIR := build
 SKETCH_DIR := sketch/$(SKETCH)
 
 DEFINE := -D__AVR_ATmega328P__
-INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/$(ARCH)
+INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
+INCLUDE += -I$(PICORTOS_DIR)/$(ARCH)
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O1 -g3 $(DEFINE) -mmcu=avr5
 SFLAGS += $(DEFINE) $(INCLUDE) -g3 -mmcu=avr5
@@ -24,6 +25,7 @@ SRC_C_FILES += $(PICORTOS_DIR)/$(ARCH)/picoRTOS_port.c
 SRC_S_FILES += $(PICORTOS_DIR)/$(ARCH)/picoRTOS_portasm.S
 
 SRC_H_FILES += $(PICORTOS_DIR)/picoRTOS.h
+SRC_H_FILES += $(PICORTOS_DIR)/arch/include/picoRTOS_port.h
 SRC_H_FILES += $(PICORTOS_DIR)/$(ARCH)/picoRTOS_types.h
 SRC_H_FILES += picoRTOSConfig.h
 

@@ -78,9 +78,9 @@ int main( void )
     static picoRTOS_stack_t stack0[CONFIG_DEFAULT_STACK_COUNT];
     static picoRTOS_stack_t stack1[CONFIG_DEFAULT_STACK_COUNT];
 
-    picoRTOS_task_init(&task, tick_main, NULL, stack0, (picoRTOS_size_t)CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, tick_main, NULL, stack0, (size_t)CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, (picoRTOS_priority_t)TASK_TICK_PRIO);
-    picoRTOS_task_init(&task, blink_main, NULL, stack1, (picoRTOS_size_t)CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, blink_main, NULL, stack1, (size_t)CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, (picoRTOS_priority_t)TASK_BLINK_PRIO);
 
     /* Start the scheduler. */

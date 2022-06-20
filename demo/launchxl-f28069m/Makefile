@@ -13,7 +13,8 @@ SDK_DIR := /c/ti/controlSUITE
 DEVICES_DIR := $(SDK_DIR)/device_support/f2806x/v151
 
 DEFINE := -D__TMS320C28XX__
-INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/c2000/c28x
+INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
+INCLUDE += -I$(PICORTOS_DIR)/arch/c2000/c28x
 
 TOOLCHAIN_DIR := $(dir $(shell which $(CC)))..
 INCLUDE += -I$(TOOLCHAIN_DIR)/include

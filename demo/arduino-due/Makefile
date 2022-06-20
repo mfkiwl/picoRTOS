@@ -11,7 +11,8 @@ BUILD_DIR := build
 SKETCH_DIR := sketch/$(SKETCH)
 
 DEFINE := -DATSAM3X8E
-INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/arm/cm3
+INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
+INCLUDE += -I$(PICORTOS_DIR)/ipc -I$(PICORTOS_DIR)/arch/arm/cm3
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O1 -g3 $(DEFINE) -mcpu=cortex-m3
 SFLAGS += $(DEFINE) $(INCLUDE) -g3 -mcpu=cortex-m3
@@ -25,6 +26,7 @@ SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.c
 SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_cond.c
 
 SRC_H_FILES += $(PICORTOS_DIR)/picoRTOS.h
+SRC_H_FILES += $(PICORTOS_DIR)/arch/include/picoRTOS_port.h
 SRC_H_FILES += $(PICORTOS_DIR)/arch/arm/cm3/picoRTOS_types.h
 SRC_H_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.h
 SRC_H_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_cond.h

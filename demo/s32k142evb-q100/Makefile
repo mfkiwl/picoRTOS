@@ -18,7 +18,8 @@ SYSROOT := $(NXP_BUILDTOOLS_DIR)/arm-none-eabi/newlib
 
 DEFINE := -DCPU_S32K142
 INCLUDE := -I$(DEVICES_DIR) -I.
-INCLUDE += -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/arm/cm4f
+INCLUDE += -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
+INCLUDE += -I$(PICORTOS_DIR)/arch/arm/cm4f
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O1 -g3 $(DEFINE)
 CFLAGS += -fmessage-length=0 -ffunction-sections -fdata-sections

@@ -20,8 +20,9 @@ SYSROOT := $(NXP_BUILDTOOLS_DIR)/e200_ewl2
 DEFINE += -DCPU_MPC5748G -DTURN_ON_CPU0
 INCLUDE += -I$(SYSROOT)/EWL_C/include -I$(SYSROOT)/EWL_C/include/pa
 INCLUDE += -I$(DEVICES_DIR) -I$(DEVICES_DIR)/common
-INCLUDE += -I$(DEVICES_DIR) -I.
-INCLUDE += -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/ppc/e200/mpc574xx
+INCLUDE += -I$(DEVICES_DIR) -I. -I$(PICORTOS_DIR) 
+INCLUDE += -I$(PICORTOS_DIR)/arch/include
+INCLUDE += -I$(PICORTOS_DIR)/arch/ppc/e200/mpc574xx
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O0 -g3 $(DEFINE)
 CFLAGS += -fmessage-length=0 -msdata=eabi -mlra -funsigned-bitfields

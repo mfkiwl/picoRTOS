@@ -31,6 +31,7 @@ add_executable(blink
 target_include_directories(blink PRIVATE
   .
   ../..
+  ../../arch/include
   ../../arch/arm/cm0+/rp2040
   )
 

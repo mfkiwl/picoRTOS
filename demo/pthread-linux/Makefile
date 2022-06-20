@@ -6,6 +6,7 @@ PICORTOS_DIR := $(abspath ../..)
 BUILD_DIR = build
 
 CFLAGS += -Wall -Wextra -I. -I$(PICORTOS_DIR) -g
+CFLAGS += -I$(PICORTOS_DIR)/arch/include
 CFLAGS += -I$(PICORTOS_DIR)/arch/pthread/linux
 
 LDFLAGS += -g -pthread

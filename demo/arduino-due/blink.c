@@ -112,15 +112,20 @@ static void blink_again_main(void *priv)
 
 static void atomic_test(void)
 {
+    picoRTOS_atomic_t res;
     picoRTOS_atomic_t tset = 0;
     picoRTOS_atomic_t one = (picoRTOS_atomic_t)1;
     picoRTOS_atomic_t two = (picoRTOS_atomic_t)2;
 
-    arch_assert(arch_test_and_set(&tset) == 0);
-    arch_assert(arch_test_and_set(&tset) != 0);
+    res = arch_test_and_set(&tset);
+    arch_assert(res == 0);
+    res = arch_test_and_set(&tset);
+    arch_assert(res != 0);
 
-    arch_assert(arch_compare_and_swap(&tset, one, two) == one);
-    arch_assert(arch_compare_and_swap(&tset, one, two) != one);
+    res = arch_compare_and_swap(&tset, one, two);
+    arch_assert(res == one);
+    res = arch_compare_and_swap(&tset, one, two);
+    arch_assert(res != one);
 }
 
 int main( void )
@@ -135,11 +140,11 @@ int main( void )
     static picoRTOS_stack_t stack1[CONFIG_DEFAULT_STACK_COUNT];
     static picoRTOS_stack_t stack2[CONFIG_DEFAULT_STACK_COUNT];
 
-    picoRTOS_task_init(&task, tick_main, NULL, stack0, (picoRTOS_size_t)CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, tick_main, NULL, stack0, (size_t)CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, (picoRTOS_priority_t)TASK_TICK_PRIO);
-    picoRTOS_task_init(&task, blink_main, NULL, stack1, (picoRTOS_size_t)CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, blink_main, NULL, stack1, (size_t)CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, (picoRTOS_priority_t)TASK_BLINK_PRIO);
-    picoRTOS_task_init(&task, blink_again_main, NULL, stack2, (picoRTOS_size_t)CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, blink_again_main, NULL, stack2, (size_t)CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, (picoRTOS_priority_t)TASK_BLINK_AGAIN_PRIO);
 
     /* Start the scheduler. */
