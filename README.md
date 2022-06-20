@@ -69,7 +69,7 @@ Example for ARM Cortex-M0+:
     SRC += picoRTOS/picoRTOS.c
     SRC += picoRTOS/arch/arm/cm0+/picoRTOS_port.c
     SRC += picoRTOS/arch/arm/cm0+/picoRTOS_portasm.S
-    CFLAGS += -IpicoRTOS -IpicoRTOS/arch/arm/cm0+
+    CFLAGS += -IpicoRTOS -IpicoRTOS/arch/include -IpicoRTOS/arch/arm/cm0+
 
 ---
 
@@ -91,8 +91,8 @@ Code-wise, using picoRTOS is quite straightforward :
         picoRTOS_task_init(&task1, task1_main, &task1_context, stack1, CONFIG_DEFAULT_TASK_COUNT);
         ...
     
-        picoRTOS_add_task(&task0, 0);
-        picoRTOS_add_task(&task1, 1);
+        picoRTOS_add_task(&task0, TASK0_PRIO);
+        picoRTOS_add_task(&task1, TASK1_PRIO);
         ...
     
         picoRTOS_start();

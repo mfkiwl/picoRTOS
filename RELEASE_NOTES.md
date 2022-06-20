@@ -1,5 +1,16 @@
 # Release notes
 
+## picoRTOS v1.4.3
+### What's new ?
+
+Fixed a huge bug in ARM Cortex-M3 & M4 compare_and_swap atomic functions.
+
+Moved all functions related to ports in arch/include to avoid them being accidentally
+called by an unsuspecting user. Internal mechanics are now more or less hidden to
+the user.
+
+Replaced the useless picoRTOS_size_t type by the standard size_t type.
+
 ## picoRTOS v1.4.2
 ### What's new ?
 
