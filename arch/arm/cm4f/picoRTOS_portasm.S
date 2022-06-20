@@ -91,8 +91,9 @@ arch_compare_and_swap:
 	cmp r3, r1
 	bne .arch_compare_and_swap_return
 	strex r3, r2, [r0]
-	it eq
-	moveq r0, r1
-	dmb ish
+	cmp r3, #0
+	bne .arch_compare_and_swap_return
+	mov r0, r1
 .arch_compare_and_swap_return:
+	dmb ish
 	bx lr
