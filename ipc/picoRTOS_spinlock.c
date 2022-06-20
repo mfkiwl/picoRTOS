@@ -1,4 +1,5 @@
 #include "picoRTOS_spinlock.h"
+#include "picoRTOS_port.h"
 
 /* check */
 #ifndef CONFIG_DEADLOCK_COUNT

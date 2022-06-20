@@ -1,4 +1,5 @@
 #include "picoRTOS-SMP.h"
+#include "picoRTOS-SMP_port.h"
 
 /* CHECK FOR OBVIOUS ERRORS */
 #if CONFIG_DEFAULT_STACK_COUNT < ARCH_MIN_STACK_COUNT

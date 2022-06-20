@@ -1,5 +1,5 @@
 CHECKS := c28x cm0+ cm3 cm4f e200z4 e200z7 e200z4-smp e200z7-smp avr5 avr6 rp2040
-SPLINTFLAGS := -I. -DCONFIG_CHECK_STACK_INTEGRITY -checks -exportlocal
+SPLINTFLAGS := -I. -Iarch/include -DCONFIG_CHECK_STACK_INTEGRITY -checks -exportlocal
 
 all: $(CHECKS)
 

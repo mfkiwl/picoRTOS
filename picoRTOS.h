@@ -36,44 +36,12 @@ void picoRTOS_sleep_until(/*@notnull@*/ picoRTOS_tick_t *ref,   /* put current t
                           picoRTOS_tick_t period);
 /*@noreturn@*/ void picoRTOS_kill(void);                        /* kills the current task */
 picoRTOS_priority_t picoRTOS_self(void);                        /* gets the current thread priority */
-
-/* switch context */
-/*@exposed@*/ picoRTOS_stack_t *
-picoRTOS_switch_context(/*@notnull@*/ picoRTOS_stack_t *sp);
-
-/* TICK */
-/*@exposed@*/ picoRTOS_stack_t *
-picoRTOS_tick(/*@notnull@*/ picoRTOS_stack_t *sp);  /* update tick */
-
-picoRTOS_tick_t picoRTOS_get_tick(void);            /* get current tick */
+picoRTOS_tick_t picoRTOS_get_tick(void);                        /* get current tick */
 
 /* TIME */
 #define PICORTOS_DELAY_SEC(x) (picoRTOS_tick_t)((x) * CONFIG_TICK_HZ)
 #define PICORTOS_DELAY_MSEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / 1000)
 #define PICORTOS_DELAY_USEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / 1000000)
-
-/* ARCH : FUNCTIONS TO IMPLEMENT */
-
-extern void arch_init(void);    /* init architecture */
-extern void arch_suspend(void); /* suspends tick */
-extern void arch_resume(void);  /* resumes tick */
-
-/*@temp@*/ extern picoRTOS_stack_t *
-arch_prepare_stack(/*@notnull@*/ struct picoRTOS_task *task);
-/*@noreturn@*/ extern void
-arch_start_first_task(/*@notnull@*/ picoRTOS_stack_t *sp);
-
-extern void arch_yield(void);
-/*@noreturn@*/ extern void arch_idle(/*@null@*/ void *null);
-
-/* ARCH: ATOMIC OPS (optional) */
-
-/*@external@*/ extern picoRTOS_atomic_t
-arch_test_and_set(/*@notnull@*/ picoRTOS_atomic_t *ptr); /* atomic test and set */
-/*@external@*/ extern picoRTOS_atomic_t
-arch_compare_and_swap(/*@notnull@*/ picoRTOS_atomic_t *var,
-                      picoRTOS_atomic_t old,
-                      picoRTOS_atomic_t val);               /* atomic compare and swap */
 
 /* assert */
 #ifndef arch_assert
