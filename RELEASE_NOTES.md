@@ -1,5 +1,10 @@
 # Release notes
 
+## picoRTOS v1.4.4
+### What's new ?
+
+Fixed a potential issue with tick overrun in picoRTOS_sleep_until
+
 ## picoRTOS v1.4.3
 ### What's new ?
 
