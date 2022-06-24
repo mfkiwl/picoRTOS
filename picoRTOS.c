@@ -152,13 +152,12 @@ void picoRTOS_sleep_until(picoRTOS_tick_t *ref, picoRTOS_tick_t period)
     arch_assert(period > 0);
     arch_assert(picoRTOS.is_running != 0);
 
-    /* compute next wakeup */
-    picoRTOS_tick_t next = *ref + period;
-
     arch_suspend();
-    if (next > picoRTOS.tick) {
-        *ref = next;
-        task->tick = next;
+
+    /* check the clock */
+    if ((picoRTOS.tick - *ref) < period) {
+        *ref = *ref + period;
+        task->tick = *ref;
         task->state = PICORTOS_TASK_STATE_SLEEP;
     }else
         /* missed the clock: reset to tick */
