@@ -34,7 +34,11 @@ void picoRTOS_schedule(void);                                   /* move to next 
 void picoRTOS_sleep(picoRTOS_tick_t delay);                     /* put current task to sleep */
 void picoRTOS_sleep_until(/*@notnull@*/ picoRTOS_tick_t *ref,   /* put current task to sleep until */
                           picoRTOS_tick_t period);
+
 /*@noreturn@*/ void picoRTOS_kill(void);                        /* kills the current task */
+int picoRTOS_join(picoRTOS_priority_t prio,
+                  picoRTOS_tick_t delay);                       /* waits for task 'prio' to end */
+
 picoRTOS_priority_t picoRTOS_self(void);                        /* gets the current thread priority */
 picoRTOS_tick_t picoRTOS_get_tick(void);                        /* get current tick */
 

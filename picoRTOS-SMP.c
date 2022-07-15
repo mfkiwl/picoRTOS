@@ -223,6 +223,21 @@ void picoRTOS_kill(void)
     arch_yield();
 }
 
+int picoRTOS_join(picoRTOS_priority_t prio, picoRTOS_tick_t delay)
+{
+    arch_assert(prio < (picoRTOS_priority_t)CONFIG_TASK_COUNT);
+    arch_assert(delay > 0);
+
+    while (picoRTOS.task[prio].state != PICORTOS_SMP_TASK_STATE_EMPTY &&
+           --delay != 0 )
+        arch_yield();
+
+    if (delay == 0)
+        return -1;
+
+    return 0;
+}
+
 picoRTOS_priority_t picoRTOS_self(void)
 {
     return (picoRTOS_priority_t)picoRTOS.index[arch_core()];
