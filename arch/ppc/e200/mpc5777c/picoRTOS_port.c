@@ -17,6 +17,15 @@
 #define PIT_TCTRL3  ((volatile unsigned long*)(PIT_BASE + 0x138))
 #define PIT_TFLG3   ((volatile unsigned long*)(PIT_BASE + 0x13c))
 
+/* MSR */
+#define ARCH_MSR_SPE (1ul << 25)
+#define ARCH_MSR_CE  (1ul << 17)
+#define ARCH_MSR_EE  (1ul << 15)
+#define ARCH_MSR_ME  (1ul << 12)
+
+#define ARCH_MSR_DEFAULT \
+    (ARCH_MSR_SPE | ARCH_MSR_CE | ARCH_MSR_EE | ARCH_MSR_ME)
+
 /* ASM */
 /*@external@*/ extern void arch_TICK(void);
 /*@external@*/ extern unsigned long arch_MSR(void);
@@ -89,7 +98,7 @@ picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
     sp[3] = 0;                                  /* lr */
     sp[2] = 0;                                  /* cr */
     /* srr[0-1] : 2 registers */
-    sp[1] = 0x29000ul | arch_MSR();             /* srr1 */
+    sp[1] = arch_MSR() | ARCH_MSR_DEFAULT;      /* srr1 */
     sp[0] = (picoRTOS_stack_t)task->fn;         /* srr0 / pc */
 
     return sp;
