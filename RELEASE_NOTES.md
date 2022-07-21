@@ -1,5 +1,10 @@
 # Release notes
 
+## picoRTOS v1.4.5
+### What's new ?
+
+Added picoRTOS_join call to allow a task to wait for another one to end
+
 ## picoRTOS v1.4.4
 ### What's new ?
 
