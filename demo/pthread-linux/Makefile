@@ -18,11 +18,8 @@ SRC_C_FILES += $(PICORTOS_DIR)/arch/pthread/linux/picoRTOS_port.c
 # demo
 SRC_C_FILES += blink.c
 
-OBJ_FILES := $(SRC_C_FILES:%.c=%.o)
-OBJ_FILES += $(SRC_S_FILES:%.S=%.o)
-
-# fix paths
-OBJ_FILES := $(addprefix $(BUILD_DIR)/,$(OBJ_FILES))
+OBJ_FILES := $(SRC_C_FILES:%.c=$(BUILD_DIR)/%.o)
+OBJ_FILES += $(SRC_S_FILES:%.S=$(BUILD_DIR)/%.o)
 
 all: $(ELF)
 

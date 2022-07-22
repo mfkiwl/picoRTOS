@@ -33,7 +33,9 @@ CFLAGS += --sysroot=$(SYSROOT) -DDEV_ERROR_DETECT
 
 SFLAGS += -x assembler-with-cpp -g3 $(DEFINE) $(INCLUDE)
 SFLAGS += -g3 -mcpu=e200z4 -specs=ewl_c9x.specs -mbig -mvle -mregnames
-SFLAGS += --sysroot=$(SYSROOT)
+SFLAGS += --sysroot=$(SYSROOT) 
+# enable caches
+SFLAGS += -DI_CACHE -DICACHE_ENABLE=1 -DD_CACHE -DDCACHE_ENABLE=1
 
 LDRAM := $(DEVICES_DIR)/MPC5748G/linker/gcc/MPC5748G_ram.ld
 LDFLASH := $(DEVICES_DIR)/MPC5748G/linker/gcc/MPC5748G_Flash.ld
@@ -57,11 +59,8 @@ SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/core_e200z4.S
 # demo
 SRC_C_FILES += blink.c
 
-OBJ_FILES := $(SRC_C_FILES:%.c=%.o)
-OBJ_FILES += $(SRC_S_FILES:%.S=%.o)
-
-# fix paths
-OBJ_FILES := $(addprefix $(BUILD_DIR)/,$(OBJ_FILES))
+OBJ_FILES := $(SRC_C_FILES:%.c=$(BUILD_DIR)/%.o)
+OBJ_FILES += $(SRC_S_FILES:%.S=$(BUILD_DIR)/%.o)
 
 all: $(ELF_RAM) $(ELF_FLASH)
 
