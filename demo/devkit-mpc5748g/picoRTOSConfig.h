@@ -19,4 +19,9 @@
 /* DEBUG */
 #define CONFIG_CHECK_STACK_INTEGRITY
 
+/* PPC specific */
+#define ARCH_PPC_E200_INTC_BASE   0xfc040000
+#define ARCH_PPC_E200_PIT_BASE    0xfff84000
+#define ARCH_PPC_E200_PIT_IRQ     229
+
 #endif

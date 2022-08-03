@@ -22,7 +22,7 @@ INCLUDE += -I$(SYSROOT)/EWL_C/include -I$(SYSROOT)/EWL_C/include/pa
 INCLUDE += -I$(DEVICES_DIR) -I$(DEVICES_DIR)/common
 INCLUDE += -I$(DEVICES_DIR) -I. -I$(PICORTOS_DIR) 
 INCLUDE += -I$(PICORTOS_DIR)/arch/include
-INCLUDE += -I$(PICORTOS_DIR)/arch/ppc/e200/mpc574xx
+INCLUDE += -I$(PICORTOS_DIR)/arch/ppc/e200/e200z4
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O0 -g3 $(DEFINE)
 CFLAGS += -fmessage-length=0 -msdata=eabi -mlra -funsigned-bitfields
@@ -47,8 +47,8 @@ SRC_S_FILES += $(DEVICES_DIR)/MPC5748G/startup/gcc/interrupt_vectors.S
 
 # picoRTOS
 SRC_C_FILES += $(PICORTOS_DIR)/picoRTOS.c
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS_port.c
-SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS_portasm.S
+SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/e200z4/picoRTOS_port.c
+SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/e200z4/picoRTOS_portasm.S
 
 # IPCs (mutex) test
 SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.c

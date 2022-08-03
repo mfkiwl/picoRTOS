@@ -1,14 +1,28 @@
 #include "picoRTOS-SMP.h"
+#include "picoRTOS-SMP_port.h"
 
 #ifndef CONFIG_DEADLOCK_COUNT
 # error Deadlock count is not defined
 #endif
 
+#ifndef ARCH_PPC_E200_INTC_BASE
+# error "INTC_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_SEMA4_BASE
+# error "SEMA4_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_MC_ME_BASE
+# error "MC_ME_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_SIUL_BASE
+# error "SIUL_BASE is not defined"
+#endif
+
 /* regs */
-#define INTC_BASE   0xfc040000
-#define SEMA42_BASE 0xfc03c000
-#define MC_ME_BASE  0xfffb8000
-#define SIUL2_BASE  0xfffc0000
+#define INTC_BASE   ARCH_PPC_E200_INTC_BASE
+#define SEMA42_BASE ARCH_PPC_E200_SEMA4_BASE
+#define MC_ME_BASE  ARCH_PPC_E200_MC_ME_BASE
+#define SIUL2_BASE  ARCH_PPC_E200_SIUL_BASE
 
 #define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x10))
 #define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x20))

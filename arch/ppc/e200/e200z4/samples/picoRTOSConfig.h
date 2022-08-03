@@ -2,24 +2,20 @@
 #define PICORTOSCONFIG_H
 
 /* CLOCKS */
-#define CONFIG_SYSCLK_HZ        4000000
-#define CONFIG_TICK_HZ          1000
+#define CONFIG_SYSCLK_HZ        40000000
+#define CONFIG_TICK_HZ          5000
 
 /* TASKS */
-#define CONFIG_TASK_COUNT       3
-#define TASK_TICK_PRIO          0
-#define TASK_LED0_PRIO          1
-#define TASK_LED1_PRIO          2
+#define CONFIG_TASK_COUNT       4
 
 /* STACK */
 #define CONFIG_DEFAULT_STACK_COUNT 256
 
 /* SMP */
-#define CONFIG_SMP_CORES          3
-#define CONFIG_DEADLOCK_COUNT     1000
+#define CONFIG_SMP_CORES      2
 
-/* DEBUG */
-#define CONFIG_CHECK_STACK_INTEGRITY
+/* MUTEX */
+#define CONFIG_DEADLOCK_COUNT 1000
 
 /* PPC specific */
 #define ARCH_PPC_E200_INTC_BASE   0xfc040000

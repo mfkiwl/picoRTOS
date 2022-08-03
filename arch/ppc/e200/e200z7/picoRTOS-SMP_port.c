@@ -1,12 +1,24 @@
 #include "picoRTOS-SMP.h"
+#include "picoRTOS-SMP_port.h"
 
 #ifndef CONFIG_DEADLOCK_COUNT
 # error Deadlock count is not defined
 #endif
 
+#ifndef ARCH_PPC_E200_INTC_BASE
+# error "INTC_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_SEMA4_BASE
+# error "SEMA4_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_SIU_BASE
+# error "SIU_BASE is not defined"
+#endif
+
 /* regs */
-#define INTC_BASE   0xfff48000
-#define SEMA42_BASE 0xfff24000
+#define INTC_BASE   ARCH_PPC_E200_INTC_BASE
+#define SEMA42_BASE ARCH_PPC_E200_SEMA4_BASE
+#define SIU_BASE    ARCH_PPC_E200_SIU_BASE
 
 #define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x8))
 #define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x10))
@@ -14,8 +26,8 @@
 #define SEMA42_GATE0 ((unsigned char*)SEMA42_BASE)
 #define SEMA42_RSTGT ((unsigned short*)(SEMA42_BASE + 0x100))
 
-#define HLT1    ((unsigned long*)0xc3f909a4)
-#define RSTVEC1 ((unsigned long*)0xc3f909b0)
+#define SIU_HLT1    ((unsigned long*)(SIU_BASE + 0x9a4))
+#define SIU_RSTVEC1 ((unsigned long*)(SIU_BASE + 0x9b0))
 
 /* ASM */
 /*@external@*/ /*@temp@*/ extern unsigned long *arch_IVPR(void);
@@ -70,8 +82,8 @@ void arch_core_init(picoRTOS_core_t core,
     arch_core_r13 = arch_R13();
 
     /* start, rst + vle */
-    RSTVEC1[core - 1] = (unsigned long)arch_core_start | 0x3;
-    *HLT1 &= ~(1u << (31 - core));
+    SIU_RSTVEC1[core - 1] = (unsigned long)arch_core_start | 0x3;
+    *SIU_HLT1 &= ~(1u << (31 - core));
 }
 
 void arch_spin_lock(void)

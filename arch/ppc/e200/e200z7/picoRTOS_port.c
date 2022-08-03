@@ -1,14 +1,25 @@
 #include "picoRTOS.h"
 
-#define INTC_BASE   0xfc040000
-#define PIT_BASE    0xfff84000
-#define PIT_IRQ     229
+/* preprocessor check */
+#ifndef ARCH_PPC_E200_INTC_BASE
+# error "INTC_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_PIT_BASE
+# error "PIT_BASE is not defined"
+#endif
+#ifndef ARCH_PPC_E200_PIT_IRQ
+# error "PIT_IRQ is not defined"
+#endif
 
-#define INTC_BCR   ((volatile unsigned long*)INTC_BASE)
-#define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x10))
-#define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x20))
-#define INTC_EOIR  ((volatile unsigned long*)(INTC_BASE + 0x30))
-#define INTC_PSR   ((volatile unsigned short*)(INTC_BASE + 0x60))
+#define INTC_BASE   ARCH_PPC_E200_INTC_BASE
+#define PIT_BASE    ARCH_PPC_E200_PIT_BASE
+#define PIT_IRQ     ARCH_PPC_E200_PIT_IRQ
+
+#define INTC_MCR   ((volatile unsigned long*)INTC_BASE)
+#define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x8))
+#define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x10))
+#define INTC_EOIR  ((volatile unsigned long*)(INTC_BASE + 0x18))
+#define INTC_PSR   ((volatile unsigned char*)(INTC_BASE + 0x40))
 
 #define PIT_MCR     ((volatile unsigned long*)PIT_BASE)
 /* channel 3 */
@@ -46,13 +57,13 @@ static void intc_init(void)
 {
     unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
 
-    *INTC_BCR = 0;
+    *INTC_MCR = 0;
     *INTC_CPR = 0;
 
     /* TICK */
     VTBA[PIT_IRQ] = (unsigned long)arch_TICK;
     /* priority 1 on any core */
-    INTC_PSR[PIT_IRQ] = (unsigned short)0xf001;
+    INTC_PSR[PIT_IRQ] = (unsigned char)0xc1u;
 }
 
 void arch_init(void)

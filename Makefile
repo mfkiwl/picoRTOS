@@ -30,21 +30,21 @@ cm4f:
 	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
 	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
-e200z4: ARCH := arch/ppc/e200/mpc574xx
+e200z4: ARCH := arch/ppc/e200/e200z4
 e200z4: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 e200z4:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
 	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
 	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
-e200z7: ARCH := arch/ppc/e200/mpc5777c
+e200z7: ARCH := arch/ppc/e200/e200z7
 e200z7: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 e200z7:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
 	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
 	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
-e200z4-smp: ARCH := arch/ppc/e200/mpc574xx
+e200z4-smp: ARCH := arch/ppc/e200/e200z4
 e200z4-smp: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 e200z4-smp:
 	splint $(SPLINTFLAGS) picoRTOS-SMP.c $(ARCH)/picoRTOS_port.c \
@@ -52,7 +52,7 @@ e200z4-smp:
 	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
 	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
-e200z7-smp: ARCH := arch/ppc/e200/mpc5777c
+e200z7-smp: ARCH := arch/ppc/e200/e200z7
 e200z7-smp: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 e200z7-smp:
 	splint $(SPLINTFLAGS) picoRTOS-SMP.c $(ARCH)/picoRTOS_port.c \

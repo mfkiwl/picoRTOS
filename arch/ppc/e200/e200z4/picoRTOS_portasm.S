@@ -1,11 +1,14 @@
+	#include "picoRTOSConfig.h"
+	
 	.global arch_TICK
 
-	.equ INTC_IACKR, 0xfff48008
-	.equ INTC_EOIR, 0xfff48018
-	.equ PIT_TFLG3, 0xc3ff013c
+	.equ INTC_IACKR, ARCH_PPC_E200_INTC_BASE + 0x20
+	.equ INTC_EOIR, ARCH_PPC_E200_INTC_BASE + 0x30
+	.equ PIT_TFLG3, ARCH_PPC_E200_PIT_BASE + 0x13c
 	
-	#include "../picoRTOS_common.S"
-
+	#include "../include/picoRTOS_portasm.S"
+	#include "../include/core_e200z4.S"
+	
 	/* TICK ISR */
 	.align 4
 	.type arch_TICK, %function
