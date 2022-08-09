@@ -8,9 +8,9 @@ CC := cl2000
 PICORTOS_DIR := ../..
 BUILD_DIR := build
 
-# SDK (you need TI controlSUITE SDK for this one)
-SDK_DIR := /c/ti/controlSUITE
-DEVICES_DIR := $(SDK_DIR)/device_support/f2806x/v151
+# SDK (you need TI C2000Ware SDK for this one)
+SDK_DIR := /c/ti/C2000Ware_4_00_00_00
+DEVICES_DIR := $(SDK_DIR)/device_support/f2806x/common
 
 DEFINE := -D__TMS320C28XX__
 INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
@@ -25,14 +25,13 @@ CFLAGS += --preproc_dependency="$(basename $(<F)).d_raw"
 
 SFLAGS := $(CFLAGS)
 
-LDRAM := $(DEVICES_DIR)/F2806x_common/cmd/f28069M_ram_lnk.cmd
-LDFLASH := $(DEVICES_DIR)/F2806x_common/cmd/F28069M.cmd
+LDRAM := -l28069_RAM_lnk.cmd
+LDFLASH := --define=_FLASH -lF28069M.cmd
 
 LDFLAGS := -v28 -ml -mt -O0 -g -z --stack_size=0x200
 LDFLAGS += $(INCLUDE) --warn_sections --reread_libs --priority
-LDFLAGS += --disable_auto_rts --rom_model
-LDFLAGS += --search_path="$(SDK_DIR)/libs/utilities/flash_api/2806x/v100/lib"
-LDFLAGS += -lrts2800_fpu32.lib
+LDFLAGS += -i"$(DEVICES_DIR)/cmd" --disable_auto_rts --rom_model
+LDFLAGS += --search_path="$(TOOLCHAIN_DIR)/lib" -lrts2800_fpu32.lib
 
 # picoRTOS
 SRC_C_FILES += $(PICORTOS_DIR)/picoRTOS.c
