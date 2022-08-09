@@ -57,7 +57,7 @@ _arch_INT14:
 	SAVE_CONTEXT
 
 	mov AR6, @SP
-	mov AR4, AR6
+	movz AR4, AR6
 	lcr _picoRTOS_tick
 
 	mov @SP, AR4
@@ -69,7 +69,7 @@ _arch_RTOSINT:
 	SAVE_CONTEXT
 
 	mov AR6, @SP
-	mov AR4, AR6
+	movz AR4, AR6
 	lcr _picoRTOS_switch_context
 
 	mov @SP, AR4
