@@ -16,7 +16,7 @@ DEVICES_DIR := $(SDK_DIR)/platform/devices
 NXP_BUILDTOOLS_DIR := $(dir $(shell which $(CROSS)$(CC)))..
 SYSROOT := $(NXP_BUILDTOOLS_DIR)/arm-none-eabi/newlib
 
-DEFINE := -DCPU_S32K142
+DEFINE := -DCPU_S32K142 -DI_CACHE -DICACHE_ENABLE=1
 INCLUDE := -I$(DEVICES_DIR) -I.
 INCLUDE += -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
 INCLUDE += -I$(PICORTOS_DIR)/arch/arm/cm4f
