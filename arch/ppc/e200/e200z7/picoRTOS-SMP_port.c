@@ -14,6 +14,9 @@
 #ifndef ARCH_PPC_E200_SIU_BASE
 # error "SIU_BASE is not defined"
 #endif
+#ifndef ARCH_PPC_E200_PIT_IRQ
+# error "PIT_IRQ is not defined"
+#endif
 
 /* regs */
 #define INTC_BASE   ARCH_PPC_E200_INTC_BASE
@@ -22,6 +25,7 @@
 
 #define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x8))
 #define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x10))
+#define INTC_PSR   ((volatile unsigned char*)(INTC_BASE + 0x40))
 
 #define SEMA42_GATE0 ((unsigned char*)SEMA42_BASE)
 #define SEMA42_RSTGT ((unsigned short*)(SEMA42_BASE + 0x100))
@@ -50,6 +54,9 @@ static void smp_intc_init(void)
         INTC_CPR[n] = 0;
         INTC_IACKR[n] = (unsigned long)VTBA;
     }
+
+    /* priority 1 on any core */
+    INTC_PSR[ARCH_PPC_E200_PIT_IRQ] = (unsigned char)0x41u;
 }
 
 void arch_smp_init(void)
@@ -82,8 +89,7 @@ void arch_core_init(picoRTOS_core_t core,
     arch_core_r13 = arch_R13();
 
     /* start, rst + vle */
-    SIU_RSTVEC1[core - 1] = (unsigned long)arch_core_start | 0x3;
-    *SIU_HLT1 &= ~(1u << (31 - core));
+    *SIU_RSTVEC1 = (unsigned long)arch_core_start | 0x1;
 }
 
 void arch_spin_lock(void)

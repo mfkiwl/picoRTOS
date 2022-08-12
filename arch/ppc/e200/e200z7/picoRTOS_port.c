@@ -62,8 +62,8 @@ static void intc_init(void)
 
     /* TICK */
     VTBA[PIT_IRQ] = (unsigned long)arch_TICK;
-    /* priority 1 on any core */
-    INTC_PSR[PIT_IRQ] = (unsigned char)0xc1u;
+    /* priority 1 on core 0 */
+    INTC_PSR[PIT_IRQ] = (unsigned char)0x1u;
 }
 
 void arch_init(void)
