@@ -15,12 +15,14 @@ picoRTOS is a teeny tiny RTOS with as little overhead as humanely possible.
  - ARM Cortex-M4F
  - ATmega2560 / AVR6
  - ATmega328P / AVR5
- - C2000 / C28x
- - PowerPC e200
+ - TI C2000 / C28x
+ - PowerPC e200z4
+ - PowerPC e200z7
 
 ### Multi-core SMP
 
- - PowerPC e200 SMP
+ - PowerPC e200z4 SMP
+ - PowerPC e200z7 SMP
  - RP2040 SMP (Raspberry Pico)
 
 ### Simulation

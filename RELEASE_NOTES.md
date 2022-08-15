@@ -1,5 +1,14 @@
 # Release notes
 
+## picoRTOS v1.4.6
+### What's new ?
+
+PPC port has been refactored, adding support for FPU, e200z7 targets in single core and SMP modes.
+NXP mpc5777c-516ds evaluation board demo has been added.
+
+TI c2000 port has been improved, forcing stack pointer address to 16 bits.
+Launchxl-f28379d evaluation board demo has been added.
+
 ## picoRTOS v1.4.5
 ### What's new ?
 
