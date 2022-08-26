@@ -42,11 +42,14 @@ struct picoRTOS_SMP_task_core {
 #endif
 };
 
+/* user tasks + idle */
+#define TASK_COUNT     (CONFIG_TASK_COUNT + CONFIG_SMP_CORES)
+#define TASK_IDLE_PRIO CONFIG_TASK_COUNT
+
 struct picoRTOS_SMP_core {
     size_t index[CONFIG_SMP_CORES];
     volatile picoRTOS_tick_t tick;
-    struct picoRTOS_SMP_task_core task[CONFIG_TASK_COUNT];
-    struct picoRTOS_SMP_task_core idle[CONFIG_SMP_CORES];
+    struct picoRTOS_SMP_task_core task[TASK_COUNT];
     /* CORES STACKS */
     struct {
         /* core 0 already has a stack, this is a waste of memory
@@ -56,9 +59,6 @@ struct picoRTOS_SMP_core {
     } core[CONFIG_SMP_CORES];
 };
 
-/* user tasks + idle */
-#define TASK_COUNT (CONFIG_TASK_COUNT + CONFIG_SMP_CORES)
-
 /* main core component */
 static struct picoRTOS_SMP_core picoRTOS;
 
@@ -67,19 +67,17 @@ static void idle_tasks_setup(void)
     size_t i;
 
     for (i = 0; i < (size_t)CONFIG_SMP_CORES; i++) {
+
         struct picoRTOS_task idle;
+        picoRTOS_priority_t prio =
+            (picoRTOS_priority_t)(TASK_IDLE_PRIO + (int)i);
 
         picoRTOS_task_init(&idle, arch_idle, NULL,
                            picoRTOS.core[i].idle_stack,
                            (size_t)ARCH_MIN_STACK_COUNT);
 
-        picoRTOS.idle[i].sp = arch_prepare_stack(&idle);
-        picoRTOS.idle[i].state = PICORTOS_SMP_TASK_STATE_READY;
-        picoRTOS.idle[i].core = (picoRTOS_mask_t)(1u << i);
-#ifdef CONFIG_CHECK_STACK_INTEGRITY
-        picoRTOS.idle[i].stack = picoRTOS.core[i].idle_stack;
-        picoRTOS.idle[i].stack_count = (size_t)ARCH_MIN_STACK_COUNT;
-#endif
+        picoRTOS_add_task(&idle, prio);
+        picoRTOS_SMP_set_core_mask(prio, (picoRTOS_mask_t)(1u << i));
     }
 }
 
@@ -109,14 +107,14 @@ void picoRTOS_init(void)
 
     /* all cores start in idle */
     while (n-- != 0)
-        picoRTOS.index[n] = (size_t)CONFIG_TASK_COUNT + n;
+        picoRTOS.index[n] = (size_t)TASK_IDLE_PRIO + n;
 }
 
 void picoRTOS_add_task(struct picoRTOS_task *task,
                        picoRTOS_priority_t prio)
 {
     /* check params */
-    arch_assert(prio < (picoRTOS_priority_t)CONFIG_TASK_COUNT);
+    arch_assert(prio < (picoRTOS_priority_t)TASK_COUNT);
     arch_assert(picoRTOS.task[prio].state == PICORTOS_SMP_TASK_STATE_EMPTY);
 
     picoRTOS.task[prio].sp = arch_prepare_stack(task);
@@ -131,7 +129,7 @@ void picoRTOS_add_task(struct picoRTOS_task *task,
 void picoRTOS_SMP_set_core_mask(picoRTOS_priority_t prio,
                                 picoRTOS_mask_t core_mask)
 {
-    arch_assert(prio < (picoRTOS_priority_t)CONFIG_TASK_COUNT);
+    arch_assert(prio < (picoRTOS_priority_t)TASK_COUNT);
     arch_assert(picoRTOS.task[prio].state == PICORTOS_SMP_TASK_STATE_READY);
 
     picoRTOS.task[prio].core = core_mask;
@@ -149,11 +147,11 @@ void picoRTOS_start(void)
         /* allocate a master stack & idle */
         arch_core_init(i, picoRTOS.core[i].stack,
                        (size_t)ARCH_MIN_STACK_COUNT,
-                       picoRTOS.idle[i].sp);
+                       picoRTOS.task[TASK_IDLE_PRIO + i].sp);
     }
 
     /* start scheduler on core #0 */
-    arch_start_first_task(picoRTOS.idle[0].sp);
+    arch_start_first_task(picoRTOS.task[TASK_IDLE_PRIO].sp);
 }
 
 void picoRTOS_suspend()
@@ -275,7 +273,7 @@ picoRTOS_stack_t *picoRTOS_switch_context(picoRTOS_stack_t *sp)
             picoRTOS.task[index].state == PICORTOS_SMP_TASK_STATE_READY)
             break;
         /* jump out on idle anyway */
-    } while (index < (CONFIG_TASK_COUNT + (size_t)core));
+    } while (index < (TASK_IDLE_PRIO + (size_t)core));
 
     picoRTOS.index[core] = index;
     picoRTOS.task[index].state = PICORTOS_SMP_TASK_STATE_RUNNING;
