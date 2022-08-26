@@ -40,18 +40,18 @@ struct picoRTOS_task_core {
 #endif
 };
 
+/* user-defined tasks + idle */
+#define TASK_COUNT      (CONFIG_TASK_COUNT + 1)
+#define TASK_IDLE_PRIO  (TASK_COUNT - 1)
+
 struct picoRTOS_core {
     int is_running;
     size_t index;
     volatile picoRTOS_tick_t tick;
-    struct picoRTOS_task_core task[CONFIG_TASK_COUNT];
+    struct picoRTOS_task_core task[TASK_COUNT];
     /* IDLE */
-    struct picoRTOS_task_core idle;
     picoRTOS_stack_t idle_stack[ARCH_MIN_STACK_COUNT];
 };
-
-/* user-defined tasks + idle */
-#define TASK_COUNT (CONFIG_TASK_COUNT + 1)
 
 /* main core component */
 static struct picoRTOS_core picoRTOS;
@@ -79,15 +79,9 @@ void picoRTOS_init(void)
     picoRTOS_task_init(&idle, arch_idle, NULL, picoRTOS.idle_stack,
                        (size_t)ARCH_MIN_STACK_COUNT);
 
-    picoRTOS.idle.sp = arch_prepare_stack(&idle);
-    picoRTOS.idle.state = PICORTOS_TASK_STATE_READY;
-#ifdef CONFIG_CHECK_STACK_INTEGRITY
-    picoRTOS.idle.stack = picoRTOS.idle_stack;
-    picoRTOS.idle.stack_count = (size_t)ARCH_MIN_STACK_COUNT;
-#endif
-
+    picoRTOS_add_task(&idle, (picoRTOS_priority_t)TASK_IDLE_PRIO);
+    picoRTOS.index = (size_t)TASK_IDLE_PRIO; /* starts at idle */
     picoRTOS.tick = 0;
-    picoRTOS.index = (size_t)CONFIG_TASK_COUNT; /* idle */
 
     /* RTOS status */
     picoRTOS.is_running = 0;
@@ -96,7 +90,7 @@ void picoRTOS_init(void)
 void picoRTOS_add_task(struct picoRTOS_task *task, picoRTOS_priority_t prio)
 {
     /* check params */
-    arch_assert(prio < (picoRTOS_priority_t)CONFIG_TASK_COUNT);
+    arch_assert(prio < (picoRTOS_priority_t)TASK_COUNT);
     arch_assert(picoRTOS.task[prio].state == PICORTOS_TASK_STATE_EMPTY);
 
     picoRTOS.task[prio].sp = arch_prepare_stack(task);
@@ -111,7 +105,7 @@ void picoRTOS_start(void)
 {
     arch_init();
     picoRTOS.is_running = 1;
-    arch_start_first_task(picoRTOS.idle.sp);
+    arch_start_first_task(picoRTOS.task[TASK_IDLE_PRIO].sp);
 }
 
 void picoRTOS_suspend()
@@ -214,7 +208,7 @@ picoRTOS_stack_t *picoRTOS_switch_context(picoRTOS_stack_t *sp)
     do
         picoRTOS.index++;
     /* ignore sleeping and empty tasks */
-    while (picoRTOS.index < (size_t)CONFIG_TASK_COUNT &&
+    while (picoRTOS.index < (size_t)TASK_IDLE_PRIO &&
            picoRTOS.task[picoRTOS.index].state != PICORTOS_TASK_STATE_READY);
 
     return picoRTOS.task[picoRTOS.index].sp;
