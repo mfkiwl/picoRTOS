@@ -19,9 +19,12 @@ pico_sdk_init()
 # Add blink example
 add_executable(blink
   blink.c
-  ../../picoRTOS.c
+  ../../picoRTOS-SMP.c
   ../../arch/arm/cm0+/picoRTOS_port.c
-  ../../arch/arm/cm0+/picoRTOS_portasm.S
+  ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_portasm.S
+  ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_port.c
+  ../../ipc/picoRTOS_mutex.c
+  ../../ipc/picoRTOS_cond.c
   )
 
 # picoRTOS includes
@@ -29,12 +32,13 @@ target_include_directories(blink PRIVATE
   .
   ../..
   ../../arch/include
-  ../../arch/arm/cm0+
+  ../../arch/arm/cm0+/rp2040
   )
 
 # pull in common dependencies
 target_link_libraries(blink
   pico_stdlib
+  pico_multicore
   )
 
 # create map/bin/hex file etc.
