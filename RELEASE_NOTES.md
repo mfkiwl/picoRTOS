@@ -1,5 +1,11 @@
 # Release notes
 
+## picoRTOS v1.4.7
+### What's new ?
+
+The idle task is now a standard task using the picoRTOS API for better readability.
+A demo for RP2040 single-core has been added, SMP has been moved to raspberry-pico-SMP.
+
 ## picoRTOS v1.4.6
 ### What's new ?
 
